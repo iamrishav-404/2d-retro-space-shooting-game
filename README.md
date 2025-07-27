@@ -1,49 +1,79 @@
-# Getting Started with Create React App
+# Retro Space Shooter 🚀
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A retro-style 2D space shooting game built with React, Phaser.js, Howler.js, and Firebase.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Retro pixel-art graphics** with authentic 8-bit style
+- **Immersive sound effects** powered by Howler.js
+- **Progressive difficulty** with increasing enemy waves
+- **High score system** with Firebase Firestore integration
+- **Responsive design** that works on desktop and mobile
+- **Multiple enemy movement patterns** (straight, zigzag, sine wave)
+- **Real-time collision detection** and physics
+- **Pause/resume functionality**
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React.js
+- **Game Engine**: Phaser.js 3
+- **Audio**: Howler.js
+- **Database**: Firebase Firestore
+- **Styling**: CSS3 with retro animations
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Game Controls
 
-### `npm test`
+- **Movement**: Arrow Keys or WASD
+- **Shoot**: Spacebar
+- **Pause**: ESC key
+- **Restart**: R key (when paused)
+- **Quit**: Q key (when paused)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup Instructions
 
-### `npm run build`
+### 1. Install Dependencies
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 2. Firebase Configuration
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable Firestore Database
+3. Copy your Firebase config
+4. Update `src/services/firebase.js` with your Firebase configuration:
 
-### `npm run eject`
+```javascript
+const firebaseConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "your-app-id"
+};
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 3. Run the Development Server
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Project Structure
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+src/
+├── components/          # React components
+├── game/               # Phaser game logic
+├── services/           # Firebase services
+└── styles/             # CSS stylesheets
+```
 
-## Learn More
+## License
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+MIT License
 
 ### Code Splitting
 

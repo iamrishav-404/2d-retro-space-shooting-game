@@ -1,0 +1,125 @@
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-container canvas {
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: contain;
+}
+
+.game-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 20px;
+  display: flex;
+  justify-content:end;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.player-info {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00ff00;
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.pilot-name {
+  color: #00ff00;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+.phaser-game {
+  border: 2px solid #00ff00;
+  border-radius: 10px;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 0, 0.5),
+    inset 0 0 20px rgba(0, 255, 0, 0.1);
+  background: #000;
+  position: relative;
+}
+
+.phaser-game canvas {
+  border-radius: 8px;
+  display: block;
+}
+
+/* Retro CRT effect */
+.phaser-game::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 255, 0, 0.03) 50%
+  );
+  background-size: 100% 2px;
+  pointer-events: none;
+  border-radius: 8px;
+  animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(2px); }
+}
+
+/* Loading/Game states */
+.game-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #00ff00;
+  font-family: 'Orbitron', monospace;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid transparent;
+  border-top: 3px solid #00ff00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .game-ui {
+    padding: 10px;
+  }
+  
+  .pilot-name {
+    font-size: 0.8rem;
+  }
+  
+  .phaser-game {
+    border-width: 1px;
+    margin: 10px;
+  }
+}

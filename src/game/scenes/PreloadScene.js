@@ -1,0 +1,115 @@
+import Phaser from 'phaser';
+
+class PreloadScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'PreloadScene' });
+  }
+
+  preload() {
+    // Create loading bar
+    this.createLoadingBar();
+
+    // Create a proper laser texture first
+    this.createLaserTexture();
+
+    // Load images - using your provided assets
+    this.load.image('background', 'assets/background_scene.png');
+    this.load.image('starship', 'assets/starship.png');
+    this.load.image('alien', 'assets/alien.png');
+    
+    // Load audio files using Howler instead of Phaser's loader to avoid CORS issues
+    // We'll initialize these in the GameScene directly with Howler
+    
+    // Update loading progress
+    this.load.on('progress', (progress) => {
+      this.updateLoadingBar(progress);
+    });
+
+    this.load.on('complete', () => {
+      this.completeLoading();
+    });
+
+    // Handle loading errors
+    this.load.on('loaderror', (file) => {
+      console.warn('Failed to load:', file.key);
+    });
+  }
+
+  createLaserTexture() {
+    // Create a simple but visible laser beam texture
+    const graphics = this.add.graphics();
+    
+    // Create a bright green laser beam
+    graphics.fillStyle(0x00ff00); // Green color
+    graphics.fillRect(0, 0, 6, 20); // Simple rectangle laser
+    
+    // Generate texture from graphics
+    graphics.generateTexture('laser', 6, 20);
+    graphics.destroy();
+  }
+
+  createLoadingBar() {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+
+    // Set retro background
+    this.cameras.main.setBackgroundColor('#000000');
+
+    // Loading text
+    this.loadingText = this.add.text(width / 2, height / 2 - 50, 'INITIALIZING SYSTEMS...', {
+      fontSize: '20px',
+      fontFamily: 'monospace',
+      color: '#ff0080',
+      align: 'center'
+    }).setOrigin(0.5);
+
+    // Loading bar background
+    this.loadingBarBg = this.add.rectangle(width / 2, height / 2, 400, 20, 0x222222);
+    this.loadingBarBg.setStrokeStyle(2, 0xff0080);
+    
+    // Loading bar fill
+    this.loadingBar = this.add.rectangle(width / 2 - 200, height / 2, 0, 18, 0xff0080);
+    this.loadingBar.setOrigin(0, 0.5);
+
+    // Percentage text
+    this.percentText = this.add.text(width / 2, height / 2 + 30, '0%', {
+      fontSize: '16px',
+      fontFamily: 'monospace',
+      color: '#00ffff',
+      align: 'center'
+    }).setOrigin(0.5);
+
+    // Add some retro flair
+    this.add.text(width / 2, 100, 'RETRO SPACE SHOOTER', {
+      fontSize: '32px',
+      fontFamily: 'monospace',
+      color: '#ffff00',
+      align: 'center'
+    }).setOrigin(0.5);
+  }
+
+  updateLoadingBar(progress) {
+    this.loadingBar.width = 400 * progress;
+    this.percentText.setText(Math.round(progress * 100) + '%');
+    
+    // Update loading text based on progress
+    if (progress < 0.3) {
+      this.loadingText.setText('LOADING SPACECRAFT...');
+    } else if (progress < 0.6) {
+      this.loadingText.setText('SCANNING ALIEN THREATS...');
+    } else if (progress < 0.9) {
+      this.loadingText.setText('INITIALIZING WEAPONS...');
+    } else {
+      this.loadingText.setText('PREPARING FOR LAUNCH...');
+    }
+  }
+
+  completeLoading() {
+    // Wait a moment then transition to intro scene
+    this.time.delayedCall(500, () => {
+      this.scene.start('IntroScene');
+    });
+  }
+}
+
+export default PreloadScene;
