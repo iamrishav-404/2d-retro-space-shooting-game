@@ -11,12 +11,18 @@ class PreloadScene extends Phaser.Scene {
 
     // Create a proper laser texture first
     this.createLaserTexture();
+    this.createEnemyLaserTexture();
 
     // Load images - using your provided assets
-    this.load.image('background', 'assets/background_scene.png');
-    this.load.image('starship', 'assets/starship.png');
-    this.load.image('alien', 'assets/alien.png');
-    
+    this.load.image('background', 'assets/images/background_scene.png');
+    this.load.image('starship', 'assets/images/starship.png');
+    this.load.image('alien', 'assets/images/alien.png');
+    this.load.image('heal', 'assets/images/health_heal.png'); 
+    this.load.spritesheet('healthPickupAnim', 'assets/images/HealthPickup.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
     // Load audio files using Howler instead of Phaser's loader to avoid CORS issues
     // We'll initialize these in the GameScene directly with Howler
     
@@ -45,6 +51,16 @@ class PreloadScene extends Phaser.Scene {
     
     // Generate texture from graphics
     graphics.generateTexture('laser', 6, 20);
+    graphics.destroy();
+  }
+
+  createEnemyLaserTexture() {
+    const graphics = this.add.graphics();
+    const radius = 5; 
+    graphics.fillStyle(0xff0000, 1); // Red color
+    graphics.fillCircle(radius, radius, radius); // Draw filled circle
+
+    graphics.generateTexture('enemyLaser',radius * 2, radius * 2);
     graphics.destroy();
   }
 

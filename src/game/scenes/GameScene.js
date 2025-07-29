@@ -1,92 +1,101 @@
-import Phaser from 'phaser';
-import { Howl } from 'howler';
-import Player from '../objects/Player';
-import Enemy from '../objects/Enemy';
-import Laser from '../objects/Laser';
-import EnemyLaser from '../objects/EnemyLaser';
+import Phaser from "phaser";
+import { Howl } from "howler";
+import Player from "../objects/Player";
+import Enemy from "../objects/Enemy";
+import Laser from "../objects/Laser";
+import EnemyLaser from "../objects/EnemyLaser";
+import PlayerHeal from "../objects/Heal";
 
 class GameScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'GameScene' });
-    
+    super({ key: "GameScene" });
+
     this.player = null;
     this.enemies = null;
     this.lasers = null;
     this.enemyLasers = null;
+    this.playerHeal = null;
     this.cursors = null;
     this.wasdKeys = null;
     this.spaceKey = null;
     this.escKey = null;
-    
+
     this.score = 0;
     this.health = 100;
     this.level = 1;
-    this.enemySpeed = 80; // Increased speed
-    this.enemySpawnRate = 1000; // Faster spawning (every 1 second)
+    this.enemySpeed =  80; // Increased speed
+    this.enemySpawnRate = 2000; //2000 // Faster spawning (every 1 second)
+    this.velocity_x = 50; // Horizontal velocity for enemies
     this.enemiesKilled = 0;
-    
+
     this.gameStarted = false;
     this.gameEnded = false;
-    
+
     // Sound objects
     this.sounds = {};
-    
+
     // UI elements
     this.scoreText = null;
     this.healthText = null;
     this.levelText = null;
-    
+
     // Background scrolling
     this.backgroundY = 0;
     this.backgroundSpeed = 2;
-    
+
     // Timers
     this.enemySpawnTimer = null;
     this.enemyShootTimer = null;
+
+    this.healDropScheduled= false;   // this value will true if first heal drop on each level
+    this.healDelay =0;
   }
 
   create() {
     // Initialize audio using Howler.js
     this.initializeSounds();
-    
+
     // Create scrolling background
     this.createBackground();
-    
+
     // Create visible borders
     this.createVisibleBorders();
-    
+
     // Create player at bottom center of the larger screen
     this.player = new Player(this, 600, 700);
-    
+
     // Create groups with physics enabled
     this.enemies = this.physics.add.group({
-      runChildUpdate: true // Enable automatic updating of children
+      runChildUpdate: true, // Enable automatic updating of children
     });
     this.lasers = this.physics.add.group({
-      runChildUpdate: true // Enable automatic updating of children
+      runChildUpdate: true,
     });
     this.enemyLasers = this.physics.add.group({
-      runChildUpdate: true // Enable automatic updating of children
+      runChildUpdate: true,
     });
-    
-    // Create input controls
+
+    this.playerHeal = this.physics.add.group({
+      runChildUpdate: true,
+    });
+
     this.createControls();
-    
-    // Create UI
     this.createUI();
-    
-    // Set up collisions
     this.setupCollisions();
-    
-    // Start enemy spawning
     this.startEnemySpawning();
-    
-    // Start enemy shooting
     this.startEnemyShooting();
-    
-    // Play background music immediately
     this.playBackgroundMusic();
-    
+
+    this.anims.create({
+      key: "health-boost",
+      frames: this.anims.generateFrameNumbers("healthPickupAnim", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 12, // Reasonable speed for 4 frames
+      repeat: -1,
+    });
+
     this.gameStarted = true;
   }
 
@@ -94,65 +103,72 @@ class GameScene extends Phaser.Scene {
     // Initialize all sounds with error handling
     try {
       this.sounds.bgMusic = new Howl({
-        src: ['./assets/background_music.mp3'],
+        src: ["./assets/background_music.mp3"],
         loop: true,
         volume: 0.3,
         html5: true,
-        onloaderror: () => console.warn('Failed to load background music')
+        onloaderror: () => console.warn("Failed to load background music"),
       });
 
       this.sounds.shootSound = new Howl({
-        src: ['./assets/shooting_sound.mp3'],
+        src: ["./assets/shooting_sound.mp3"],
         volume: 0.5,
         html5: true,
-        onloaderror: () => console.warn('Failed to load shoot sound')
+        onloaderror: () => console.warn("Failed to load shoot sound"),
       });
 
       this.sounds.enemyDie = new Howl({
-        src: ['./assets/enemy_die_sound.mp3'],
+        src: ["./assets/enemy_die_sound.mp3"],
         volume: 0.6,
         html5: true,
-        onloaderror: () => console.warn('Failed to load enemy die sound')
+        onloaderror: () => console.warn("Failed to load enemy die sound"),
       });
 
       this.sounds.playerDamage = new Howl({
-        src: ['./assets/player_damage_sound.mp3'],
+        src: ["./assets/player_damage_sound.mp3"],
         volume: 0.7,
         html5: true,
-        onloaderror: () => console.warn('Failed to load player damage sound')
+        onloaderror: () => console.warn("Failed to load player damage sound"),
       });
 
       this.sounds.playerDie = new Howl({
-        src: ['./assets/player_die_sound.mp3'],
+        src: ["./assets/player_die_sound.mp3"],
         volume: 0.8,
         html5: true,
-        onloaderror: () => console.warn('Failed to load player die sound')
+        onloaderror: () => console.warn("Failed to load player die sound"),
       });
 
       this.sounds.gameIntro = new Howl({
-        src: ['./assets/game_intro_music.mp3'],
+        src: ["./assets/game_intro_music.mp3"],
         volume: 0.5,
         html5: true,
-        onloaderror: () => console.warn('Failed to load intro music')
+        onloaderror: () => console.warn("Failed to load intro music"),
+      });
+
+      this.sounds.healthPickup = new Howl({
+        src: ["./assets/player_health_boost.mp3"],
+        volume: 0.5,
+        html5: true,
+        onloaderror: () => console.warn("Failed to load health pickup sound"),
       });
     } catch (error) {
-      console.warn('Error initializing sounds:', error);
+      console.warn("Error initializing sounds:", error);
     }
   }
 
   createBackground() {
     // Use your provided background image
-    this.background1 = this.add.image(600, 400, 'background');
-    this.background2 = this.add.image(600, -400, 'background');
-    
+    this.background1 = this.add.image(600, 400, "background");
+    this.background2 = this.add.image(600, -400, "background");
+
     // Scale backgrounds to fit the wider screen properly
     const scaleX = 1200 / this.background1.width;
     const scaleY = 800 / this.background1.height;
     const scale = Math.max(scaleX, scaleY);
-    
+
     this.background1.setScale(scale);
     this.background2.setScale(scale);
-    
+
     // Set backgrounds to be behind everything
     this.background1.setDepth(-100);
     this.background2.setDepth(-100);
@@ -162,23 +178,33 @@ class GameScene extends Phaser.Scene {
     // Create only a bottom border that stays within screen bounds
     const borderThickness = 12; // Much thicker border
     const borderColor = 0x00ff00; // Green color
-    
+
     // Bottom border - positioned within the 800px screen height
-    this.bottomBorder = this.add.rectangle(600, 790, 1200, borderThickness, borderColor);
-    this.bottomBorder.setDepth(50); // Above everything   
+    this.bottomBorder = this.add.rectangle(
+      600,
+      790,
+      1200,
+      borderThickness,
+      borderColor
+    );
+    this.bottomBorder.setDepth(50); // Above everything
   }
 
   createControls() {
     // Arrow keys
     this.cursors = this.input.keyboard.createCursorKeys();
-    
+
     // WASD keys
-    this.wasdKeys = this.input.keyboard.addKeys('W,S,A,D');
-    
+    this.wasdKeys = this.input.keyboard.addKeys("W,S,A,D");
+
     // Space and Escape keys
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    
+    this.spaceKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
+    this.escKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ESC
+    );
+
     // Prevent space from scrolling page
     this.spaceKey.preventDefault = true;
   }
@@ -186,38 +212,38 @@ class GameScene extends Phaser.Scene {
   createUI() {
     // Create retro-styled UI
     // Score display
-    this.scoreText = this.add.text(20, 20, 'SCORE: 0', {
-      fontSize: '20px',
-      fontFamily: 'monospace',
-      color: '#ff0080'
+    this.scoreText = this.add.text(20, 20, "SCORE: 0", {
+      fontSize: "20px",
+      fontFamily: "monospace",
+      color: "#ff0080",
     });
 
     // Health display
-    this.healthText = this.add.text(20, 50, 'HEALTH: 100', {
-      fontSize: '20px',
-      fontFamily: 'monospace',
-      color: '#00ff00'
+    this.healthText = this.add.text(20, 50, "HEALTH: 100", {
+      fontSize: "20px",
+      fontFamily: "monospace",
+      color: "#00ff00",
     });
 
     // Level display
-    this.levelText = this.add.text(20, 80, 'LEVEL: 1', {
-      fontSize: '20px',
-      fontFamily: 'monospace',
-      color: '#00ffff'
+    this.levelText = this.add.text(20, 80, "LEVEL: 1", {
+      fontSize: "20px",
+      fontFamily: "monospace",
+      color: "#00ffff",
     });
 
     // Enemy kill counter
-    this.killText = this.add.text(20, 110, 'KILLS: 0', {
-      fontSize: '20px',
-      fontFamily: 'monospace',
-      color: '#ffff00'
+    this.killText = this.add.text(20, 110, "KILLS: 0", {
+      fontSize: "20px",
+      fontFamily: "monospace",
+      color: "#ffff00",
     });
 
     // Instructions
-    this.add.text(600, 550, 'ESC: PAUSE', {
-      fontSize: '14px',
-      fontFamily: 'monospace',
-      color: '#888888'
+    this.add.text(600, 550, "ESC: PAUSE", {
+      fontSize: "14px",
+      fontFamily: "monospace",
+      color: "#888888",
     });
 
     // Set UI depth to be on top
@@ -235,16 +261,86 @@ class GameScene extends Phaser.Scene {
     });
 
     // Enemy lasers hit player
-    this.physics.add.overlap(this.player, this.enemyLasers, (player, enemyLaser) => {
-      this.playerTakeDamage(10);
-      enemyLaser.destroy();
-    });
+    this.physics.add.overlap(
+      this.player,
+      this.enemyLasers,
+      (player, enemyLaser) => {
+        this.playerTakeDamage(10);
+        enemyLaser.destroy();
+      }
+    );
 
     // Player collides with enemies
     this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
       this.destroyEnemy(enemy);
       this.playerTakeDamage(25);
     });
+
+    //health pickup collision
+    this.physics.add.overlap(
+      this.lasers,
+      this.playerHeal,
+      (playerLaser, heal) => {
+        this.health += 20;
+        this.health = Math.min(this.health, 100);
+        this.healthText.setText("HEALTH: " + this.health);
+        this.showHealthEffect();
+        heal.destroy();
+
+        // add delay before next heal drop
+        this.healDelay = Phaser.Math.Between(5000, 10000);
+        this.time.delayedCall(this.healDelay, () => {
+          if (this.health < 40 && this.playerHeal.countActive(true) === 0) {
+            this.addPlayerHeal();
+          }
+        });
+      }
+    );
+  }
+
+  showHealthEffect() {
+    if (this.anims.exists("health-boost")) {
+      const healthEffect = this.add.sprite(
+        this.player.x,
+        this.player.y,
+        "healthPickupAnim"
+      );
+      healthEffect.setScale(3);
+      healthEffect.setDepth(this.player.depth - 1);
+      healthEffect.play("health-boost");
+
+      // Play health pickup sound ONCE at the start
+      if (this.sounds.healthPickup) {
+        try {
+          this.sounds.healthPickup.play();
+        } catch (error) {
+          console.warn("Error playing health pickup sound:", error);
+        }
+      }
+
+      // Make the effect follow the player
+      this.tweens.addCounter({
+        from: 0,
+        to: 1,
+        duration: 1000,
+        onUpdate: () => {
+          healthEffect.x = this.player.x;
+          healthEffect.y = this.player.y;
+        },
+        onComplete: () => {
+          healthEffect.destroy();
+        },
+      });
+    } else {
+      // Fallback: just play the sound if animation is missing
+      if (this.sounds.healthPickup) {
+        try {
+          this.sounds.healthPickup.play();
+        } catch (error) {
+          console.warn("Error playing health pickup sound:", error);
+        }
+      }
+    }
   }
 
   startEnemySpawning() {
@@ -252,16 +348,16 @@ class GameScene extends Phaser.Scene {
       delay: this.enemySpawnRate,
       callback: this.spawnEnemy,
       callbackScope: this,
-      loop: true
+      loop: true,
     });
   }
 
   startEnemyShooting() {
     this.enemyShootTimer = this.time.addEvent({
-      delay: 3000, // Enemies shoot every 3 seconds
+      delay: 1000, // Enemies shoot every 1 seconds
       callback: this.randomEnemyShoot,
       callbackScope: this,
-      loop: true
+      loop: true,
     });
   }
 
@@ -271,7 +367,7 @@ class GameScene extends Phaser.Scene {
         this.sounds.bgMusic.play();
       }
     } catch (error) {
-      console.warn('Error playing background music:', error);
+      console.warn("Error playing background music:", error);
     }
   }
 
@@ -280,46 +376,49 @@ class GameScene extends Phaser.Scene {
 
     // Update background scrolling
     this.updateBackground();
-    
+
     // Handle input
     this.handleInput();
-    
+
     // Update player
     if (this.player) {
       this.player.update();
     }
-    
+
     // Update enemies
-    this.enemies.children.entries.forEach(enemy => {
+    this.enemies.children.entries.forEach((enemy) => {
       if (enemy.update) {
         enemy.update();
       }
     });
-    
+
     // Update laser groups manually
-    this.lasers.children.entries.forEach(laser => {
+    this.lasers.children.entries.forEach((laser) => {
       if (laser.update) {
         laser.update();
       }
     });
-    
-    this.enemyLasers.children.entries.forEach(enemyLaser => {
+
+    this.enemyLasers.children.entries.forEach((enemyLaser) => {
       if (enemyLaser.update) {
         enemyLaser.update();
       }
     });
-    
+
     // Clean up off-screen objects
     this.cleanupObjects();
-    
+
     // Update difficulty
     this.updateDifficulty();
+
+    // add player heal
+    // this.addPlayerHeal();
   }
 
   updateBackground() {
     this.background1.y += this.backgroundSpeed;
     this.background2.y += this.backgroundSpeed;
-    
+
     // Reset background positions for infinite scroll (adjusted for 800px height)
     if (this.background1.y > 1200) {
       this.background1.y = this.background2.y - 800;
@@ -344,7 +443,12 @@ class GameScene extends Phaser.Scene {
 
     // Update player movement
     if (this.player) {
-      this.player.handleMovement(leftPressed, rightPressed, upPressed, downPressed);
+      this.player.handleMovement(
+        leftPressed,
+        rightPressed,
+        upPressed,
+        downPressed
+      );
     }
 
     // Shooting input - continuous shooting while holding space
@@ -358,31 +462,53 @@ class GameScene extends Phaser.Scene {
       const laser = new Laser(this, this.player.x, this.player.y - 30);
       this.lasers.add(laser);
       this.player.resetShootCooldown();
-      
+
       // Play shooting sound
       try {
         if (this.sounds.shootSound) {
           this.sounds.shootSound.play();
         }
       } catch (error) {
-        console.warn('Error playing shoot sound:', error);
+        console.warn("Error playing shoot sound:", error);
       }
     }
   }
 
   spawnEnemy() {
     const x = Phaser.Math.Between(100, 1100); // Wider spawn range for 1200px width
-    const enemy = new Enemy(this, x, -50, this.enemySpeed, this.level);
+    this.velocity_x = Phaser.Math.Between(10, 60); // Random horizontal velocity
+    const enemy = new Enemy(
+      this,
+      x,
+      -50,
+      this.enemySpeed,
+      this.level,
+      this.velocity_x
+    );
     this.enemies.add(enemy);
-    console.log('Enemy spawned at:', x, -50, 'Level:', this.level, 'Total enemies:', this.enemies.children.size);
+    console.log(
+      "Enemy spawned at:",
+      x,
+      -50,
+      "Level:",
+      this.level,
+      "Total enemies:",
+      this.enemies.children.size
+    );
   }
 
   randomEnemyShoot() {
     // Pick a random active enemy to shoot
-    const activeEnemies = this.enemies.children.entries.filter(enemy => enemy.active && enemy.y > 0 && enemy.y < 400);
+    const activeEnemies = this.enemies.children.entries.filter(
+      (enemy) => enemy.active && enemy.y > 0 && enemy.y < 750
+    );
     if (activeEnemies.length > 0) {
-      const randomEnemy = Phaser.Utils.Array.GetRandom(activeEnemies);
-      this.enemyShoot(randomEnemy);
+      // const randomEnemy = Phaser.Utils.Array.GetRandom(activeEnemies);
+      // this.enemyShoot(randomEnemy);
+
+      activeEnemies.forEach((enemy) => {
+        this.enemyShoot(enemy);
+      });
     }
   }
 
@@ -400,34 +526,34 @@ class GameScene extends Phaser.Scene {
         this.sounds.enemyDie.play();
       }
     } catch (error) {
-      console.warn('Error playing enemy death sound:', error);
+      console.warn("Error playing enemy death sound:", error);
     }
-    
+
     // Add to score and kill count
     this.score += 100;
     this.enemiesKilled += 1;
-    
+
     // Update UI
-    this.scoreText.setText('SCORE: ' + this.score);
-    this.killText.setText('KILLS: ' + this.enemiesKilled);
-    
+    this.scoreText.setText("SCORE: " + this.score);
+    this.killText.setText("KILLS: " + this.enemiesKilled);
+
     // Destroy enemy
     enemy.destroy();
   }
 
   playerTakeDamage(damage) {
     this.health -= damage;
-    this.healthText.setText('HEALTH: ' + Math.max(0, this.health));
-    
+    this.healthText.setText("HEALTH: " + Math.max(0, this.health));
+
     // Play damage sound
     try {
       if (this.sounds.playerDamage) {
         this.sounds.playerDamage.play();
       }
     } catch (error) {
-      console.warn('Error playing damage sound:', error);
+      console.warn("Error playing damage sound:", error);
     }
-    
+
     // Flash player red
     if (this.player) {
       this.player.setTint(0xff0000);
@@ -437,32 +563,47 @@ class GameScene extends Phaser.Scene {
         }
       });
     }
-    
+
+    if (
+      this.health < 40 &&
+      this.playerHeal.countActive(true) === 0 &&
+      !this.healDropScheduled
+    ) {
+      this.addPlayerHeal();
+      this.healDropScheduled = true;
+    }
     // Check for game over
     if (this.health <= 0) {
       this.gameOver();
     }
   }
 
+  addPlayerHeal() {
+    if (this.health < 40 && this.playerHeal.countActive(true) === 0) {
+      const x = Phaser.Math.Between(100, 1100);
+      const heal = new PlayerHeal(this, x, -50);
+      this.playerHeal.add(heal);
+    }
+  }
+
   cleanupObjects() {
     // Remove lasers that are off-screen
-    this.lasers.children.entries.forEach(laser => {
+    this.lasers.children.entries.forEach((laser) => {
       if (laser.y < -50) {
         laser.destroy();
       }
     });
 
-    this.enemyLasers.children.entries.forEach(laser => {
-      if (laser.y > 850) { // Adjusted for 800px height
+    this.enemyLasers.children.entries.forEach((laser) => {
+      if (laser.y > 850) {
         laser.destroy();
       }
     });
 
     // Handle enemies reaching the bottom - damage player
-    this.enemies.children.entries.forEach(enemy => {
-      if (enemy.y > 750) { // When enemy reaches near bottom (before starship area)
-        // Damage player when enemy reaches bottom
-        this.playerTakeDamage(15);
+    this.enemies.children.entries.forEach((enemy) => {
+      if (enemy.y > 750) {
+        //this.playerTakeDamage(15);
         enemy.destroy();
       }
     });
@@ -472,91 +613,94 @@ class GameScene extends Phaser.Scene {
     const newLevel = Math.floor(this.enemiesKilled / 10) + 1;
     if (newLevel > this.level) {
       this.level = newLevel;
-      this.levelText.setText('LEVEL: ' + this.level);
-      
+      this.levelText.setText("LEVEL: " + this.level);
+
       // Increase difficulty
       this.enemySpeed += 10;
       this.enemySpawnRate = Math.max(500, this.enemySpawnRate - 100);
       this.backgroundSpeed += 0.2;
-      
+
       // Update spawn timer
       if (this.enemySpawnTimer) {
         this.enemySpawnTimer.destroy();
         this.startEnemySpawning();
       }
-      
+
       // Flash level up message
-      const levelUpText = this.add.text(400, 300, 'LEVEL UP!', {
-        fontSize: '48px',
-        fontFamily: 'monospace',
-        color: '#ffff00'
-      }).setOrigin(0.5).setDepth(200);
-      
+      const levelUpText = this.add
+        .text(400, 300, "LEVEL UP!", {
+          fontSize: "48px",
+          fontFamily: "monospace",
+          color: "#ffff00",
+        })
+        .setOrigin(0.5)
+        .setDepth(200);
+
       this.tweens.add({
         targets: levelUpText,
         alpha: 0,
         y: 200,
         duration: 2000,
-        ease: 'Power2',
-        onComplete: () => levelUpText.destroy()
+        ease: "Power2",
+        onComplete: () => levelUpText.destroy(),
       });
     }
   }
 
   pauseGame() {
     this.scene.pause();
-    this.scene.launch('PauseScene');
-    
+    this.scene.launch("PauseScene");
+
     // Pause all sounds
-    Object.values(this.sounds).forEach(sound => {
+    Object.values(this.sounds).forEach((sound) => {
       try {
         if (sound.playing()) {
           sound.pause();
         }
       } catch (error) {
-        console.warn('Error pausing sound:', error);
+        console.warn("Error pausing sound:", error);
       }
     });
   }
 
   resumeGame() {
     this.scene.resume();
-    
+
     // Resume all sounds
-    Object.values(this.sounds).forEach(sound => {
+    Object.values(this.sounds).forEach((sound) => {
       try {
         if (sound._sounds[0] && sound._sounds[0]._paused) {
           sound.play();
         }
       } catch (error) {
-        console.warn('Error resuming sound:', error);
+        console.warn("Error resuming sound:", error);
       }
     });
   }
 
   gameOver() {
     if (this.gameEnded) return;
-    
+
     this.gameEnded = true;
-    
+
     // Stop all sounds
-    Object.values(this.sounds).forEach(sound => {
+    Object.values(this.sounds).forEach((sound) => {
       try {
         sound.stop();
       } catch (error) {
-        console.warn('Error stopping sound:', error);
+        console.warn("Error stopping sound:", error);
       }
     });
-    
+
     // Play death sound
     try {
       if (this.sounds.playerDie) {
         this.sounds.playerDie.play();
       }
     } catch (error) {
-      console.warn('Error playing death sound:', error);
+      console.warn("Error playing death sound:", error);
     }
-    
+
     // Stop enemy spawning
     if (this.enemySpawnTimer) {
       this.enemySpawnTimer.destroy();
@@ -564,15 +708,16 @@ class GameScene extends Phaser.Scene {
     if (this.enemyShootTimer) {
       this.enemyShootTimer.destroy();
     }
-    
+
     // Get the game end callback from registry
-    const onGameEnd = this.registry.get('onGameEnd');
+    const onGameEnd = this.registry.get("onGameEnd");
     if (onGameEnd) {
       // Delay to let death sound play
       this.time.delayedCall(1000, () => {
         onGameEnd(this.score);
       });
     }
+    this.playerHeal.clear(true, true);
   }
 }
 

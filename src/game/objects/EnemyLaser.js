@@ -2,29 +2,23 @@ import Phaser from 'phaser';
 
 class EnemyLaser extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, 'laser');
-    
-    // Add to scene and enable physics
+    super(scene, x, y, 'enemyLaser');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    
-    // Set laser properties
-    this.setScale(1.5); // Make enemy laser bigger and more visible
-    this.setTint(0xff0080); // Bright pink/red tint for enemy lasers
-    
-    // Set velocity (downward) - faster movement
-    this.setVelocityY(500);
-    
-    // Add glow effect
-    this.setBlendMode(Phaser.BlendModes.ADD);
-    
-    // Set depth to be above background but below UI
-    this.setDepth(20);
-    
-    console.log('Enemy laser created at:', x, y, 'with velocity:', this.body.velocity.y);
+
+    this.speed = 500; 
+    this.setScale(1.5); 
+
+    this.setDepth(10); 
+    if (this.body) {
+      this.body.setVelocityY(this.speed);
+      console.log('Enemy laser created with velocity:', this.body.velocity.y);
+    }
   }
 
   update() {
+    // Manual movement as backup (in case physics isn't working)
+    this.y += this.speed * (1/60); // Assuming 60 FPS
     // Destroy if off screen
     if (this.y > 850) {
       this.destroy();
