@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y) {
+  constructor(scene, x, y,speed=300) {
     super(scene, x, y, 'starship');
     
     // Add to scene and physics
@@ -11,7 +11,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     // Set up physics properties
     this.setCollideWorldBounds(true);
     this.setDrag(300);
-    this.setMaxVelocity(300);
+    //this.setMaxVelocity(2000);
     
     // Scale the player ship to be smaller
     this.setScale(0.1);
@@ -22,12 +22,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.shootDelay = 200; // Faster shooting - more lasers visible
     
     // Movement speed
-    this.speed = 300;
-    
+    this.speed = speed;
+
     // Set depth to be above background
     this.setDepth(10);
-    
-    console.log('Player created at:', x, y, 'with scale:', this.scaleX);
+
+    console.log('Player created at:', x, y, 'with speed of:', this.speed);
   }
 
   update() {

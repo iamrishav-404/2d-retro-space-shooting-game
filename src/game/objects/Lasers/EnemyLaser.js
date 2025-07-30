@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 
 class EnemyLaser extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y) {
-    super(scene, x, y, 'enemyLaser');
+  constructor(scene, x, y,laserName) {
+    super(scene, x, y,laserName);
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -12,7 +12,7 @@ class EnemyLaser extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(10); 
     if (this.body) {
       this.body.setVelocityY(this.speed);
-      console.log('Enemy laser created with velocity:', this.body.velocity.y);
+      console.log(laserName,' created with velocity:', this.body.velocity.y);
     }
   }
 

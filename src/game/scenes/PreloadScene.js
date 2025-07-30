@@ -12,6 +12,7 @@ class PreloadScene extends Phaser.Scene {
     // Create a proper laser texture first
     this.createLaserTexture();
     this.createEnemyLaserTexture();
+    this.createEnemyStarshipLaserTexture();
 
     // Load images - using your provided assets
     this.load.image('background', 'assets/images/background_scene.png');
@@ -22,6 +23,13 @@ class PreloadScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32
     });
+    this.load.image('enemyStarship',"assets/images/Enemy_Starship.png")
+    this.load.image('speedBoost', 'assets/images/speed_boost.png');
+    this.load.spritesheet('speedBoostAnim', 'assets/images/speed_boost_ani.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    }); 
+    
 
     // Load audio files using Howler instead of Phaser's loader to avoid CORS issues
     // We'll initialize these in the GameScene directly with Howler
@@ -62,6 +70,19 @@ class PreloadScene extends Phaser.Scene {
 
     graphics.generateTexture('enemyLaser',radius * 2, radius * 2);
     graphics.destroy();
+  }
+
+  createEnemyStarshipLaserTexture() {
+     const graphics = this.add.graphics();
+
+    // Create a bright red laser beam
+    graphics.fillStyle(0xff0000); // Red color
+    graphics.fillRect(0, 0, 6, 20); // Simple rectangle laser
+    
+    // Generate texture from graphics
+    graphics.generateTexture('enemyStarshipLaser', 6, 20);
+    graphics.destroy();
+
   }
 
   createLoadingBar() {

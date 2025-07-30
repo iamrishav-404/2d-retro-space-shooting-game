@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 
-class PlayerHeal extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y) {
-    super(scene, x, y, "heal");
+class PowerUps extends Phaser.Physics.Arcade.Sprite {
+  constructor(scene, x, y,name) {
+    super(scene, x, y, name);
 
 
     this.speed = 80; // Set speed for upward movement
@@ -12,11 +12,9 @@ class PlayerHeal extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(20);
 
     if (!this.body) {
-      console.error("Enemy physics body not found!");
+      console.error("PowerUps ", name, " physics body not found!");
       return;
     }
-
-
   
   }
   update() {
@@ -27,4 +25,4 @@ class PlayerHeal extends Phaser.Physics.Arcade.Sprite {
   }
 }
 
-export default PlayerHeal;
+export default PowerUps;

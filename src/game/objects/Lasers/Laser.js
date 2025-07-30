@@ -9,8 +9,8 @@ class Laser extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     
     // Set laser properties
-    this.speed = 600; // Movement speed
-    this.setScale(1.5); // Make laser bigger and more visible
+    this.speed = 600; 
+    this.setScale(1.5); 
     this.setTint(0x00ff00); // Bright green color
     
     // Add strong glow effect
