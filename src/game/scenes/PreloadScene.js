@@ -44,7 +44,12 @@ class PreloadScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
-
+    this.load.image('L2enemy','assets/images/L2Enemy.png')
+    this.load.image('shield','assets/images/shield.png')
+    this.load.spritesheet('shieldAnim', 'assets/images/shield_spritesheet.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    });
     // Load audio files using Howler instead of Phaser's loader to avoid CORS issues
     // We'll initialize these in the GameScene directly with Howler
     

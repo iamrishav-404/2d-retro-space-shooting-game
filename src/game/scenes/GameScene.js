@@ -8,6 +8,7 @@ import PowerUps from "../objects/PowerUps";
 import EnemyStarShip from "../objects/Enemies/EnemyStarShip";
 import L1EnemyStarShip from "../objects/Enemies/L1Enemy";
 import PowerLaser from "../objects/Lasers/PowerLaser";
+import L2EnemyStarShip from "../objects/Enemies/L2Enemy";
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -19,13 +20,15 @@ class GameScene extends Phaser.Scene {
     this.enemyLasers = null;
     this.enemyStarships = null;
     this.enemyStarshipLasers = null;
-
     this.L1Enemies = null;
     this.L1EnemyLasers = null;
+    this.L2Enemies = null;
+    this.L2EnemiesLasers  = null;
 
     this.playerHeal = null;
     this.speedBoost = null;
     this.laserBoost = null;
+    this.shield = null;
 
     this.cursors = null;
     this.wasdKeys = null;
@@ -40,6 +43,7 @@ class GameScene extends Phaser.Scene {
     this.enemySpawnRate = 2000;
     this.enemyStarshipSpawnRate = 5000;
     this.L1EnemySpawnRate = 5000;
+    this.L2EnemySpawnRate = 5000;
     this.enemiesKilled = 0;
     this.velocity_x = 40;
     this.playerSpeed =300;
@@ -63,6 +67,7 @@ class GameScene extends Phaser.Scene {
     this.enemyShootTimer = null;
     this.enemyStarshipSpawnTimer = null;
     this.L1EnemySpawnTimer = null;
+    this.L2EnemySpawnTimer = null;
 
    
     this.healDropTimer = null; 
@@ -70,6 +75,8 @@ class GameScene extends Phaser.Scene {
     this.speedBoostEffectTimer = null; 
     this.laserBoostDropTimer = null;
     this.laserBoostEffectTimer = null;
+    this.shieldTimer = null;
+    this.shieldEffectTimer = null;
 
     this.healthThreshold = 40;
     this.originalPlayerSpeed = null; 
@@ -78,6 +85,9 @@ class GameScene extends Phaser.Scene {
     this.powerLaserDuration = 10000;
     this.laserBoostActive = false;
     this.laserBoostTimer = null;
+
+    this.shieldEffect = null;
+    this.shieldTween = null;
   }
 
   create() {
@@ -133,6 +143,15 @@ class GameScene extends Phaser.Scene {
       runChildUpdate: true,
     });
 
+    this.L2Enemies = this.physics.add.group({
+      runChildUpdate : true,
+    });
+    this.L2EnemiesLasers = this.physics.add.group({
+      runChildUpdate: true
+    })
+    this.shield = this.physics.add.group({
+      runChildUpdate: true,
+    });
 
     this.createControls();
     this.createUI();
@@ -178,6 +197,16 @@ class GameScene extends Phaser.Scene {
         end: 9, 
       }),
       frameRate: 30,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "shield-anim",
+      frames: this.anims.generateFrameNumbers("shieldAnim", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 12,
       repeat: -1,
     });
 
@@ -255,6 +284,12 @@ class GameScene extends Phaser.Scene {
       console.warn("Error initializing sounds:", error);
     }
 
+    this.sounds.shieldEffect = new Howl({
+      src: ["./assets/shield.mp3"],
+      volume: 0.5,
+      html5: true,
+      onloaderror: () => console.warn("Failed to load shield effect sound"),
+    });
 
   }
 
@@ -376,7 +411,9 @@ class GameScene extends Phaser.Scene {
       this.player,
       this.enemyLasers,
       (player, enemyLaser) => {
-        this.playerTakeDamage(10);
+        if (!this.shieldEffect) {
+          this.playerTakeDamage(10);
+        }
         enemyLaser.destroy();
       }
     );
@@ -385,7 +422,9 @@ class GameScene extends Phaser.Scene {
       this.player,
       this.enemyStarshipLasers,
       (player, enemyStarshipLaser) => {
-        this.playerTakeDamage(15);
+        if (!this.shieldEffect) {
+          this.playerTakeDamage(15);
+        }
         enemyStarshipLaser.destroy();
       }
     );
@@ -393,7 +432,9 @@ class GameScene extends Phaser.Scene {
     // Player collides with enemies
     this.physics.add.overlap(this.player, this.enemies, (player, enemy) => {
       this.destroyEnemyOnly(enemy);
-      this.playerTakeDamage(25);
+      if (!this.shieldEffect) {
+        this.playerTakeDamage(25);
+      }
     });
 
     this.physics.add.overlap(
@@ -401,7 +442,9 @@ class GameScene extends Phaser.Scene {
       this.enemyStarships,
       (player, enemyStarship) => {
         this.destroyEnemyOnly(enemyStarship);
-        this.playerTakeDamage(35);
+        if (!this.shieldEffect) {
+          this.playerTakeDamage(35);
+        }
       }
     );
 
@@ -437,10 +480,14 @@ class GameScene extends Phaser.Scene {
     });
     this.physics.add.overlap(this.player, this.L1Enemies, (player, enemy) => {
       this.destroyEnemyOnly(enemy);
-      this.playerTakeDamage(30);
+      if (!this.shieldEffect) {
+        this.playerTakeDamage(30);
+      }
     });
     this.physics.add.overlap(this.player, this.L1EnemyLasers, (player, enemyLaser) => {
-      this.playerTakeDamage(25);
+      if (!this.shieldEffect) {
+        this.playerTakeDamage(25);
+      }
       enemyLaser.destroy();
     });
 
@@ -469,6 +516,11 @@ class GameScene extends Phaser.Scene {
       this.destroyEnemy(l1Enemy);
       powerLaser.destroy();
     });
+    this.physics.add.overlap(this.powerLasers, this.L2Enemies, (powerLaser, l2Enemy) => {
+      this.destroyEnemy(l2Enemy);
+      powerLaser.destroy();
+    });
+
 
     // Power lasers can also collect power-ups
     this.physics.add.overlap(this.powerLasers, this.playerHeal, (powerLaser, heal) => {
@@ -485,7 +537,74 @@ class GameScene extends Phaser.Scene {
       this.collectLaserBoost(laserBoost);
       powerLaser.destroy();
     });
-  
+    this.physics.add.overlap(this.powerLasers, this.shield, (powerLaser, shield) => {
+      this.collectShield(shield);
+      powerLaser.destroy();
+    });
+
+    //L2Enemies Collison
+    this.physics.add.overlap(this.lasers, this.L2Enemies, (laser, enemy) => {
+      const isDestroyed = enemy.takeDamage(1);
+      if (isDestroyed) {
+        this.destroyEnemy(enemy);
+      }
+      laser.destroy();
+    });
+    this.physics.add.overlap(this.player, this.L2EnemiesLasers,(player, laser) =>{
+      if (!this.shieldEffect) {
+        this.playerTakeDamage(35);
+      }
+      laser.destroy();
+    })
+    this.physics.add.overlap(this.player, this.L2Enemies, (player, enemy) => {
+      this.destroyEnemyOnly(enemy);
+      if (!this.shieldEffect) {
+        this.playerTakeDamage(50);
+      }
+    });
+
+    // Shield collision
+    this.physics.add.overlap(this.lasers, this.shield, (laser, shield) => {
+      laser.destroy();
+      this.collectShield(shield);
+    });
+    this.physics.add.overlap(this.player, this.shield, (player, shield) => {
+      this.collectShield(shield);
+     
+    });
+
+    //Shield effect collisons
+    this.physics.add.overlap(this.lasers, this.shield, (laser, shield) => {
+      laser.destroy();
+      this.collectShield(shield);
+    });
+    this.physics.add.overlap(this.player, this.shield, (player, shield) => {
+      this.collectShield(shield);
+    });
+    this.physics.add.overlap(this.enemyLasers, this.shieldEffect, (enemyLaser, shield) => {
+      enemyLaser.destroy();
+    });
+    this.physics.add.overlap(this.enemies, this.shieldEffect, (enemy, shield) => {
+      this.destroyEnemyOnly(enemy);
+    });
+    this.physics.add.overlap(this.enemyStarships, this.shieldEffect, (enemyStarship, shield) => {
+      this.destroyEnemyOnly(enemyStarship);
+    });
+    this.physics.add.overlap(this.enemyStarshipLasers, this.shieldEffect, (enemyStarshipLaser, shield) => {
+      enemyStarshipLaser.destroy();
+    });
+    this.physics.add.overlap(this.L1Enemies, this.shieldEffect, (l1Enemy, shield) => {
+      this.destroyEnemyOnly(l1Enemy);
+    });
+    this.physics.add.overlap(this.L1EnemyLasers, this.shieldEffect, (l1EnemyLaser, shield) => {
+      l1EnemyLaser.destroy();
+    });
+    this.physics.add.overlap(this.L2Enemies, this.shieldEffect, (l2Enemy, shield) => {
+      this.destroyEnemyOnly(l2Enemy);
+    });
+    this.physics.add.overlap(this.L2EnemiesLasers, this.shieldEffect, (l2EnemyLaser, shield) => {
+      l2EnemyLaser.destroy();
+    });
   }
 
   collectHealthPickup(heal) {
@@ -664,8 +783,8 @@ class GameScene extends Phaser.Scene {
     laserEffect.setDepth(this.player.depth - 1);
     laserEffect.play("laser-boost-effect");
 
-    // Play laser boost sound
-    if (this.sounds.laserBoost) {
+    // Play laser boost sound only if game is active
+    if (this.sounds.laserBoost && this.gameStarted && !this.gameEnded) {
       try {
         this.sounds.laserBoost.play();
       } catch (error) {
@@ -690,17 +809,97 @@ class GameScene extends Phaser.Scene {
       },
     });
   } else {
-    // Fallback: just play the sound
-    if (this.sounds.laserBoost) {
+    // Fallback: just play the sound if animation exists and game is active
+    if (this.sounds.laserBoost && this.gameStarted && !this.gameEnded) {
       try {
         this.sounds.laserBoost.play();
       } catch (error) {
         console.warn("Error playing laser boost sound:", error);
       }
     }
+   }
   }
-}
 
+  collectShield(shield) {
+    // Stop any existing shield effect timer
+    if (this.shieldEffectTimer) {
+      this.shieldEffectTimer.remove(false);
+    }
+
+    
+    this.showShieldEffect();
+    // Set timer to remove shield after 5 seconds
+    this.shieldEffectTimer = this.time.delayedCall(5000, () => {
+      this.removeShield();
+    });
+
+    shield.destroy();
+  }
+
+  removeShield() {
+    // Stop the tween if it's still running
+    if (this.shieldTween) {
+      this.shieldTween.destroy();
+      this.shieldTween = null;
+    }
+    
+    if (this.shieldEffect) {
+      this.shieldEffect.destroy();
+      this.shieldEffect = null;
+    }
+    
+    if (this.sounds.shieldEffect) {
+      this.sounds.shieldEffect.stop();
+    }
+    
+    this.shieldEffectTimer = null;
+  }
+
+  showShieldEffect() {
+    if (this.anims.exists("shield-anim")) {
+      this.shieldEffect = this.add.sprite(
+        this.player.x,
+        this.player.y,
+        "shieldAnim"
+      );
+      this.shieldEffect.setScale(3);
+      this.shieldEffect.setDepth(this.player.depth - 1);
+      this.shieldEffect.play("shield-anim");
+
+      // Play shield sound ONCE at the start
+      if (this.sounds.shieldEffect) {
+        try {
+          this.sounds.shieldEffect.play();
+        } catch (error) {
+          console.warn("Error playing shield sound:", error);
+        }
+      }
+      
+      // Store the tween reference so we can destroy it if needed
+      this.shieldTween = this.tweens.addCounter({
+        from: 0,
+        to: 1,
+        duration: 5000,
+        onUpdate: () => {
+          // Add null checks to prevent the error
+          if (this.shieldEffect && this.player) {
+            this.shieldEffect.x = this.player.x;
+            this.shieldEffect.y = this.player.y;
+          }
+        },
+        onComplete: () => {
+          if (this.shieldEffect) {
+            this.shieldEffect.destroy();
+            this.shieldEffect = null;
+          }
+          if (this.sounds.shieldEffect) {
+            this.sounds.shieldEffect.stop();
+          }
+          this.shieldTween = null;
+        },
+      });
+    }
+  }
 
   startEnemySpawning() {
     this.enemySpawnTimer = this.time.addEvent({
@@ -729,6 +928,15 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  startL2EnemySpawning() {
+    this.L2EnemySpawnTimer = this.time.addEvent({
+      delay: this.L2EnemySpawnRate,
+      callback: this.spawnL2Enemy,
+      callbackScope: this,
+      loop: true,
+    });
+  }
+
   startEnemyShooting() {
     this.enemyShootTimer = this.time.addEvent({
       delay: 1000, 
@@ -751,6 +959,15 @@ class GameScene extends Phaser.Scene {
     this.L1EnemyShootTimer = this.time.addEvent({
       delay: 500, 
       callback: this.L1EnemyShoot,
+      callbackScope: this,
+      loop: true,
+    });
+  }
+
+  startL2EnemyShooting() {
+    this.L2EnemyShootTimer = this.time.addEvent({
+      delay: 700,
+      callback: this.L2EnemyShoot,
       callbackScope: this,
       loop: true,
     });
@@ -922,6 +1139,14 @@ class GameScene extends Phaser.Scene {
     }
   }
 
+  spawnL2Enemy() {
+    const x = Phaser.Math.Between(100, 1200);
+    const l2enemy = new L2EnemyStarShip(this, x, -50);
+    if (this.L2Enemies.countActive(true) < 1) {
+      this.L2Enemies.add(l2enemy);
+    }
+  }
+
   enemyShoot() {
     // Pick a random active enemy to shoot
     const activeEnemies = this.enemies.children.entries.filter(
@@ -973,6 +1198,20 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  L2EnemyShoot() {
+    this.L2Enemies.children.each((l2Enemy) => {
+      if(l2Enemy.active){
+        const l2EnemyLaser = new EnemyLaser(
+          this,
+          l2Enemy.x,
+          l2Enemy.y + 30,
+          "L1EnemyLaser"
+        );
+        this.L2EnemiesLasers.add(l2EnemyLaser);
+      }
+    }
+  )}
+
   destroyEnemy(enemy) {
     // Play enemy death sound
     try {
@@ -988,6 +1227,9 @@ class GameScene extends Phaser.Scene {
     } 
     else if(enemy instanceof L1EnemyStarShip) {
       this.score += 250;
+    }
+    else if(enemy instanceof L2EnemyStarShip) {
+      this.score += 350;
     }
     else {
       this.score += 100;
@@ -1052,7 +1294,13 @@ class GameScene extends Phaser.Scene {
     if (this.healDropTimer) {
       return; // Timer already running
     }
-    const healDelay = Phaser.Math.Between(4000, 8000);
+    let healDelay;
+    if(this.level === 4){
+      healDelay = Phaser.Math.Between(3000, 6000);
+    }
+    else{
+    healDelay = Phaser.Math.Between(4000, 8000);
+    }
     this.healDropTimer = this.time.addEvent({
       delay: healDelay,
       callback: this.checkAndDropHeal,
@@ -1071,9 +1319,17 @@ class GameScene extends Phaser.Scene {
 
   // Check if a heal should be dropped
   checkAndDropHeal() {
+    
+    let activeHealsLimit;
+    if(this.level === 4){
+      activeHealsLimit = 2; 
+    }
+    else{
+      activeHealsLimit = 1;
+    }
     if (
       this.health < this.healthThreshold &&
-      this.playerHeal.countActive(true) === 0
+      this.playerHeal.countActive(true) < activeHealsLimit
     ) {
       this.addPlayerHeal();
     }
@@ -1136,7 +1392,13 @@ class GameScene extends Phaser.Scene {
     if (this.laserBoostDropTimer) {
       return; // Timer already running
     }
-    const laserBoostDelay = Phaser.Math.Between(5000, 15000);
+    let laserBoostDelay;
+    if(this.level === 4){
+      laserBoostDelay = Phaser.Math.Between(15000, 30000);
+    }
+    else {
+      laserBoostDelay = Phaser.Math.Between(5000, 15000);
+    }
     this.laserBoostDropTimer = this.time.addEvent({
       delay: laserBoostDelay,
       callback: this.checkAndDropLaserBoost,
@@ -1157,6 +1419,43 @@ class GameScene extends Phaser.Scene {
       const x = Phaser.Math.Between(100, 1100);
       const laserBoost = new PowerUps(this, x, -50, 'laserboost',0.1);
       this.laserBoost.add(laserBoost);
+    }
+  }
+
+  startShieldTimer() {
+    if (this.shieldTimer) {
+      return; // Timer already running
+    }
+    
+    let shieldDelay;
+    if (this.level === 4) {
+      // Much longer delays for level 4 - shields are very powerful
+      shieldDelay = Phaser.Math.Between(20000, 25000); // 20-25 seconds
+    } else {
+      // Standard delays for earlier levels
+      shieldDelay = Phaser.Math.Between(12000, 25000); // 12-25 seconds
+    }
+    
+    this.shieldTimer = this.time.addEvent({
+      delay: shieldDelay,
+      callback: this.checkAndDropShield,
+      callbackScope: this,
+      loop: true,
+    });
+  }
+
+  stopShieldTimer() {
+    if (this.shieldTimer) {
+      this.shieldTimer.remove(false);
+      this.shieldTimer = null;
+    }
+  }
+
+  checkAndDropShield() {
+    if (this.shield.countActive(true) === 0) {
+      const x = Phaser.Math.Between(100, 1100);
+      const shield = new PowerUps(this, x, -50, 'shield');
+      this.shield.add(shield);
     }
   }
 
@@ -1230,6 +1529,27 @@ class GameScene extends Phaser.Scene {
       }
     });
 
+    this.L2Enemies.children.entries.forEach((l2Enemy) => {
+      if (l2Enemy.y > 750) {
+        if (l2Enemy.healthBar) {
+          l2Enemy.healthBar.destroy();
+        }
+        l2Enemy.destroy();
+      }
+    });
+    this.L2EnemiesLasers.children.entries.forEach((l2EnemyLaser) => {
+      if (l2EnemyLaser.y > 850) {
+        l2EnemyLaser.destroy();
+      }
+    });
+
+    this.shield.children.entries.forEach((shield) => {
+      if (shield.y > 850) {
+        shield.destroy();
+      }
+    });
+
+
   }
 
   getGameLevel(){
@@ -1248,7 +1568,10 @@ class GameScene extends Phaser.Scene {
   }
 
   testingGameLevel(){
-     if(this.score >= 300){  // Just need 300 points (3 enemies) to reach level 3
+    if(this.score >= 400){  
+      return 4;
+    }
+    else if(this.score >= 300){  // Just need 300 points (3 enemies) to reach level 3
     return 3;
   }
   else if(this.score >= 200){  // 200 points for level 2
@@ -1329,8 +1652,46 @@ class GameScene extends Phaser.Scene {
         this.startL1EnemyShooting();
         }
 
+        // Restart laser boost timer with new level delays
+        if (this.laserBoostDropTimer) {
+          this.laserBoostDropTimer.destroy();
+          this.laserBoostDropTimer = null;
+        }
         this.startLaserBoostTimer();
         
+      }
+
+      if( this.level === 4) {
+        this.healthThreshold = 70;
+        if(!this.L2EnemySpawnTimer) {
+          this.startL2EnemySpawning();
+          this.startL2EnemyShooting();
+        }
+
+        // Restart heal timer with level 4 delays (faster heals for harder difficulty)
+        if (this.healDropTimer) {
+          this.healDropTimer.destroy();
+          this.healDropTimer = null;
+          // Only restart if health is still low
+          if (this.health < this.healthThreshold) {
+            this.startHealDropTimer();
+          }
+        }
+
+        // Restart shield timer with level 4 delays (much longer delays)
+        if (this.shieldTimer) {
+          this.shieldTimer.destroy();
+          this.shieldTimer = null;
+        }
+        this.startShieldTimer();
+
+        // Restart laser boost timer with level 4 delays (longer delays)
+        if (this.laserBoostDropTimer) {
+          this.laserBoostDropTimer.destroy();
+          this.laserBoostDropTimer = null;
+        }
+        this.startLaserBoostTimer();
+
       }
   
       // Flash level up message
@@ -1358,7 +1719,7 @@ class GameScene extends Phaser.Scene {
     this.scene.pause();
     this.scene.launch("PauseScene");
 
-    // Pause all sounds
+    // Pause all sounds properly
     Object.values(this.sounds).forEach((sound) => {
       try {
         if (sound.playing()) {
@@ -1368,21 +1729,25 @@ class GameScene extends Phaser.Scene {
         console.warn("Error pausing sound:", error);
       }
     });
+
+    // Stop laser boost sound completely if it's playing (since it loops)
+    if (this.sounds.laserBoost && this.sounds.laserBoost.playing()) {
+      this.sounds.laserBoost.stop();
+    }
   }
 
   resumeGame() {
     this.scene.resume();
 
-    // Resume all sounds
-    Object.values(this.sounds).forEach((sound) => {
-      try {
-        if (sound._sounds[0] && sound._sounds[0]._paused) {
-          sound.play();
-        }
-      } catch (error) {
-        console.warn("Error resuming sound:", error);
+    // Only resume background music, not all sounds
+    try {
+      if (this.sounds.bgMusic && this.sounds.bgMusic._sounds[0] && this.sounds.bgMusic._sounds[0]._paused) {
+        this.sounds.bgMusic.play();
       }
-    });
+    } catch (error) {
+      console.warn("Error resuming background music:", error);
+    }
+
   }
 
   gameOver() {
@@ -1436,6 +1801,15 @@ class GameScene extends Phaser.Scene {
     }
     if (this.laserBoostDropTimer) {
       this.laserBoostDropTimer.remove(false);
+    }
+    if (this.L2EnemySpawnTimer) {
+      this.L2EnemySpawnTimer.destroy();
+    }
+    if (this.L2EnemyShootTimer) {
+      this.L2EnemyShootTimer.destroy();
+    }
+    if (this.shieldTimer) {
+      this.shieldTimer.remove(false);
     }
 
     this.playerHeal.clear(true, true);
