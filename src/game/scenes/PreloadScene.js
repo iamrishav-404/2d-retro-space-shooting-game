@@ -13,6 +13,7 @@ class PreloadScene extends Phaser.Scene {
     this.createLaserTexture();
     this.createEnemyLaserTexture();
     this.createEnemyStarshipLaserTexture();
+    this.createL1EnemyLaserTexture();
 
     // Load images - using your provided assets
     this.load.image('background', 'assets/images/background_scene.png');
@@ -29,7 +30,20 @@ class PreloadScene extends Phaser.Scene {
       frameWidth: 48,
       frameHeight: 48
     }); 
-    
+    this.load.image('L1enemy',"assets/images/L1Enemy.png")
+    this.load.image('laserboost',"assets/images/laser_boost.png")
+    this.load.spritesheet('healthBar', 'assets/images/healthbar_spritesheet.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    });
+    this.load.spritesheet('laserBoostAnim', 'assets/images/laserboost_spritesheet.png',{
+      frameWidth: 64,
+      frameHeight: 64
+    });
+    this.load.spritesheet('laserBoostEffectAnim', 'assets/images/laserboostview_spritesheet.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    });
 
     // Load audio files using Howler instead of Phaser's loader to avoid CORS issues
     // We'll initialize these in the GameScene directly with Howler
@@ -83,6 +97,16 @@ class PreloadScene extends Phaser.Scene {
     graphics.generateTexture('enemyStarshipLaser', 6, 20);
     graphics.destroy();
 
+  }
+
+  createL1EnemyLaserTexture(){
+    const graphics = this.add.graphics();
+    const radius = 7; 
+    graphics.fillStyle(0xff0000, 1); 
+    graphics.fillCircle(radius, radius, radius);
+
+    graphics.generateTexture('L1EnemyLaser',radius * 2, radius * 2);
+    graphics.destroy();
   }
 
   createLoadingBar() {

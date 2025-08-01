@@ -1,14 +1,14 @@
 import Phaser from "phaser";
 
 class PowerUps extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y,name) {
+  constructor(scene, x, y,name,scale=0.05) {
     super(scene, x, y, name);
 
 
     this.speed = 80; // Set speed for upward movement
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setScale(0.05); // Make it smaller
+    this.setScale(scale); // Make it smaller
     this.setDepth(20);
 
     if (!this.body) {
