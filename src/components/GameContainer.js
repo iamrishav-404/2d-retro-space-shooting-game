@@ -59,9 +59,9 @@ const GameContainer = ({ onGameEnd, playerName }) => {
   return (
     <div className="game-container">
       <div className="game-ui">
-        <div className="player-info">
+        {/* <div className="player-info">
           <span className="pilot-name">PILOT: {playerName}</span>
-        </div>
+        </div> */}
       </div>
       <div 
         ref={gameRef} 

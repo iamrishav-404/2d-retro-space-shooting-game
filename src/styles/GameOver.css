@@ -46,9 +46,8 @@
   font-weight: 900;
   color: #ff0000;
   text-shadow: 
-    0 0 10px #ff0000,
-    0 0 20px #ff0000,
-    0 0 30px #ff0000;
+    0 0 5px #ff0000,
+    0 0 10px #ff0000;
   margin-bottom: 30px;
   letter-spacing: 4px;
   animation: danger-pulse 1.5s ease-in-out infinite alternate;
@@ -57,16 +56,14 @@
 @keyframes danger-pulse {
   0% {
     text-shadow: 
-      0 0 10px #ff0000,
-      0 0 20px #ff0000,
-      0 0 30px #ff0000;
+      0 0 5px #ff0000,
+      0 0 10px #ff0000;
   }
   100% {
     text-shadow: 
+      0 0 8px #ff0000,
       0 0 15px #ff0000,
-      0 0 25px #ff0000,
-      0 0 35px #ff0000,
-      0 0 45px #ff0000;
+      0 0 20px #ff0000;
   }
 }
 

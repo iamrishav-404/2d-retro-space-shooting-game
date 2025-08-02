@@ -6,7 +6,7 @@ import HighScores from './HighScores';
 import '../styles/Game.css';
 
 const Game = () => {
-  const [gameState, setGameState] = useState('menu'); // menu, playing, gameOver, highScores
+  const [gameState, setGameState] = useState('menu'); 
   const [score, setScore] = useState(0);
   const [playerName, setPlayerName] = useState('');
 
