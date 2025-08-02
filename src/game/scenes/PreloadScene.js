@@ -6,16 +6,12 @@ class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    // Create loading bar
     this.createLoadingBar();
-
-    // Create a proper laser texture first
     this.createLaserTexture();
     this.createEnemyLaserTexture();
     this.createEnemyStarshipLaserTexture();
     this.createL1EnemyLaserTexture();
 
-    // Load images - using your provided assets
     this.load.image('background', 'assets/images/background_scene.png');
     this.load.image('starship', 'assets/images/starship.png');
     this.load.image('alien', 'assets/images/alien.png');
@@ -50,8 +46,11 @@ class PreloadScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
-    // Load audio files using Howler instead of Phaser's loader to avoid CORS issues
-    // We'll initialize these in the GameScene directly with Howler
+    this.load.image('L3enemy','assets/images/L3Enemy.png');
+    this.load.image('timer', 'assets/images/time_freeze.png');
+    this.load.image('freezingEffect', 'assets/images/stars_stars.png');
+
+
     
     // Update loading progress
     this.load.on('progress', (progress) => {
@@ -69,14 +68,12 @@ class PreloadScene extends Phaser.Scene {
   }
 
   createLaserTexture() {
-    // Create a simple but visible laser beam texture
     const graphics = this.add.graphics();
-    
-    // Create a bright green laser beam
+  
     graphics.fillStyle(0x00ff00); // Green color
     graphics.fillRect(0, 0, 6, 20); // Simple rectangle laser
     
-    // Generate texture from graphics
+
     graphics.generateTexture('laser', 6, 20);
     graphics.destroy();
   }
@@ -94,11 +91,9 @@ class PreloadScene extends Phaser.Scene {
   createEnemyStarshipLaserTexture() {
      const graphics = this.add.graphics();
 
-    // Create a bright red laser beam
     graphics.fillStyle(0xff0000); // Red color
     graphics.fillRect(0, 0, 6, 20); // Simple rectangle laser
     
-    // Generate texture from graphics
     graphics.generateTexture('enemyStarshipLaser', 6, 20);
     graphics.destroy();
 
@@ -118,10 +113,8 @@ class PreloadScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Set retro background
     this.cameras.main.setBackgroundColor('#000000');
 
-    // Loading text
     this.loadingText = this.add.text(width / 2, height / 2 - 50, 'INITIALIZING SYSTEMS...', {
       fontSize: '20px',
       fontFamily: 'monospace',
@@ -129,15 +122,12 @@ class PreloadScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
-    // Loading bar background
     this.loadingBarBg = this.add.rectangle(width / 2, height / 2, 400, 20, 0x222222);
     this.loadingBarBg.setStrokeStyle(2, 0xff0080);
     
-    // Loading bar fill
     this.loadingBar = this.add.rectangle(width / 2 - 200, height / 2, 0, 18, 0xff0080);
     this.loadingBar.setOrigin(0, 0.5);
 
-    // Percentage text
     this.percentText = this.add.text(width / 2, height / 2 + 30, '0%', {
       fontSize: '16px',
       fontFamily: 'monospace',
@@ -145,7 +135,6 @@ class PreloadScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
-    // Add some retro flair
     this.add.text(width / 2, 100, 'RETRO SPACE SHOOTER', {
       fontSize: '32px',
       fontFamily: 'monospace',
@@ -158,7 +147,7 @@ class PreloadScene extends Phaser.Scene {
     this.loadingBar.width = 400 * progress;
     this.percentText.setText(Math.round(progress * 100) + '%');
     
-    // Update loading text based on progress
+    // update loading text based on progress
     if (progress < 0.3) {
       this.loadingText.setText('LOADING SPACECRAFT...');
     } else if (progress < 0.6) {

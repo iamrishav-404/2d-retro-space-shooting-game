@@ -10,7 +10,7 @@ class PauseScene extends Phaser.Scene {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
 
-    // Create semi-transparent overlay
+    // Semi-transparent overlay
     const overlay = this.add.rectangle(centerX, centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.7);
     overlay.setOrigin(0.5);
 
@@ -21,7 +21,6 @@ class PauseScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5);
 
-    // Instructions
     this.add.text(centerX, centerY, 'PRESS ESC TO RESUME', {
       font: '24px monospace',
       fill: '#ffffff',

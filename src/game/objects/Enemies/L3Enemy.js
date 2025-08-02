@@ -1,18 +1,18 @@
 import Phaser from "phaser";
 
-class L1EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
+class L3EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, "L1enemy");
+    super(scene, x, y, "L3enemy");
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
+
     this.baseSpeed = 80;
-    this.maxHealth = 2;
-    this.currentHealth = 2;
+    this.maxHealth = 4;
+    this.currentHealth = 4;
 
     this.setScale(0.13);
     this.setDepth(5);
-
     this.createHealthBar();
 
     if (!this.body) {
@@ -22,12 +22,10 @@ class L1EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
   }
 
   createHealthBar() {
-    // Health bar sprite above the enemy
-    this.healthBar = this.scene.add.sprite(this.x, this.y - 40, 'healthBar');
+    this.healthBar = this.scene.add.sprite(this.x, this.y - 50, 'healthBar');
     this.healthBar.setScale(0.5);
-    this.healthBar.setDepth(15); // Above enemy but below UI
+    this.healthBar.setDepth(15); 
     
-    // Initial frame (full health = frame 0)
     this.healthBar.setFrame(0);
   }
 
@@ -35,7 +33,9 @@ class L1EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
     this.currentHealth -= damage;
     this.currentHealth = Math.max(0, this.currentHealth);
     
+
     this.updateHealthBar();
+    
     this.setTint(0xff0000);
     this.scene.time.delayedCall(100, () => {
       this.clearTint();
@@ -67,15 +67,13 @@ class L1EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(this.baseSpeed);
     }
     
-    // Update health bar position to follow enemy
     if (this.healthBar) {
       this.healthBar.x = this.x;
-      this.healthBar.y = this.y - 40;
+      this.healthBar.y = this.y - 50;
     }
   }
 
   destroy() {
-    // Clean up health bar when enemy is destroyed
     if (this.healthBar) {
       this.healthBar.destroy();
     }
@@ -83,4 +81,4 @@ class L1EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
   }
 }
 
-export default L1EnemyStarShip;
+export default L3EnemyStarShip;

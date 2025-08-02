@@ -4,11 +4,8 @@ class EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, isHorizontalMovement = false) {
     super(scene, x, y, "enemyStarship");
 
-    // Add to scene and physics
     scene.add.existing(this);
     scene.physics.add.existing(this);
-
-    // Store base speed and level
     this.baseSpeed = 80;
     this.velocity_x = 50;
     this.isHorizontalMovement = isHorizontalMovement; 
@@ -26,7 +23,7 @@ class EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
 
 
   update() {
-    // Ensure we always have some downward movement (except for horizontal sweep)
+    // Downward movement
     if (this.body && Math.abs(this.body.velocity.y) < 20) {
       this.setVelocityY(this.baseSpeed);
     }
@@ -44,7 +41,7 @@ class EnemyStarShip extends Phaser.Physics.Arcade.Sprite {
       ) {
         this.setVelocityX(-this.velocity_x); 
       }
-      // If velocity is zero (e.g., after spawn), set initial direction based on spawn position
+      //  If velocity is zero, inital movement based on position
       if (this.body.velocity.x === 0) {
         if (this.x < screenWidth / 2) {
           this.setVelocityX(this.velocity_x); 

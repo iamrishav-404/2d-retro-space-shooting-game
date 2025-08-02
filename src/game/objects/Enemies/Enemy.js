@@ -4,24 +4,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, speed = 80, level = 1,velocity_x= 0) {
     super(scene, x, y, "alien");
 
-    // Add to scene and physics
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    // Store base speed and level
     this.baseSpeed = speed;
     this.gameLevel = level;
-    this.velocity_x = velocity_x; // Store horizontal velocity
+    this.velocity_x = velocity_x; 
 
-    // Scale the enemy to be much smaller - make it tiny
     this.setScale(0.07);
-
-    // Set depth to be above background but below UI
     this.setDepth(5);
 
-    this.spawnX = x; // Store spawn position for horizontal movement
-
-    // Set up initial movement based on pattern
+    this.spawnX = x;
     this.setupMovement();
 
     console.log(
@@ -38,7 +31,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   setupMovement() {
-    // Ensure physics body exists
     if (!this.body) {
       console.error("Enemy physics body not found!");
       return;
@@ -46,12 +38,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    // Ensure we always have some downward movement (except for horizontal sweep)
+    // downward movement 
     if (this.body && Math.abs(this.body.velocity.y) < 20) {
       this.setVelocityY(this.baseSpeed);
     }
-    // Move horizontally based on current position
-    // Bounce horizontally at screen edges
+    // Horizontally  move 
     if (this.body) {
       const screenWidth = this.scene.sys.game.config.width;
       const halfWidth = (this.width * this.scaleX) / 2;
@@ -65,12 +56,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       ) {
         this.setVelocityX(-this.velocity_x); // Move left
       }
-      // If velocity is zero (e.g., after spawn), set initial direction based on spawn position
+      // If velocity is zero, inital movement based on position
       if (this.body.velocity.x === 0) {
         if (this.x < screenWidth / 2) {
-          this.setVelocityX(this.velocity_x); // Start moving right
+          this.setVelocityX(this.velocity_x); 
         } else {
-          this.setVelocityX(-this.velocity_x); // Start moving left
+          this.setVelocityX(-this.velocity_x);
         }
       }
     }

@@ -17,9 +17,8 @@ class EnemyLaser extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    // Manual movement as backup (in case physics isn't working)
+    // Manual movement as backup in case physics isn't working
     this.y += this.speed * (1/60); // Assuming 60 FPS
-    // Destroy if off screen
     if (this.y > 850) {
       this.destroy();
     }

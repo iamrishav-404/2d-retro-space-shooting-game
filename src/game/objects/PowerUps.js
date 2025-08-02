@@ -5,10 +5,10 @@ class PowerUps extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, name);
 
 
-    this.speed = 80; // Set speed for upward movement
+    this.speed = 80; 
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setScale(scale); // Make it smaller
+    this.setScale(scale); 
     this.setDepth(20);
 
     if (!this.body) {

@@ -6,8 +6,8 @@ import GameContainer from './components/GameContainer';
 function App() {
   return (
     <div className="App">
-      {/* <Game /> */}
-      <GameContainer />
+      <Game />
+      {/* <GameContainer /> */}
     </div>
   );
 }

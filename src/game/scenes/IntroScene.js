@@ -14,39 +14,29 @@ class IntroScene extends Phaser.Scene {
   }
 
   create() {
-    // Create scrolling background
     this.createBackground();
-    
-    // Play intro music
     this.playIntroMusic();
-    
-    // Create title screen
     this.createTitleScreen();
-    
-    // Start the intro sequence
     this.time.delayedCall(2000, () => {
       this.startCountdown();
     });
   }
 
   createBackground() {
-    // Use the same background as the game
     this.background1 = this.add.image(600, 400, 'background');
     this.background2 = this.add.image(600, -400, 'background');
     
-    // Scale backgrounds to fit screen properly
     const scaleX = 1200 / this.background1.width;
     const scaleY = 800 / this.background1.height;
     const scale = Math.max(scaleX, scaleY);
     
     this.background1.setScale(scale);
     this.background2.setScale(scale);
-    
-    // Set backgrounds to be behind everything
+
     this.background1.setDepth(-100);
     this.background2.setDepth(-100);
     
-    // Add dark overlay for better text visibility
+    // Adding dark overlay for better text visibility
     this.overlay = this.add.rectangle(600, 400, 1200, 800, 0x000000, 0.6);
     this.overlay.setDepth(-50);
   }
@@ -64,7 +54,6 @@ class IntroScene extends Phaser.Scene {
     // Add glow effect
     this.titleText.setShadow(0, 0, '#ff0080', 10, true, true);
     
-    // Subtitle
     this.subtitleText = this.add.text(600, 280, 'DEFEND EARTH FROM ALIEN INVASION!', {
       fontSize: '24px',
       fontFamily: 'monospace',
@@ -98,7 +87,6 @@ class IntroScene extends Phaser.Scene {
       color: '#ffffff'
     }).setOrigin(0.5);
     
-    // Mission briefing
     this.add.text(600, 480, 'MISSION: Destroy all alien invaders!', {
       fontSize: '18px',
       fontFamily: 'monospace',
@@ -111,7 +99,7 @@ class IntroScene extends Phaser.Scene {
       color: '#888888'
     }).setOrigin(0.5);
     
-    // Add pulsing animation to title
+    // Adding pulsing animation to title
     this.tweens.add({
       targets: this.titleText,
       scaleX: 1.1,
@@ -122,7 +110,7 @@ class IntroScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
     
-    // Add floating animation to subtitle
+    // Adding floating animation to subtitle
     this.tweens.add({
       targets: this.subtitleText,
       y: 290,
@@ -157,8 +145,7 @@ class IntroScene extends Phaser.Scene {
       }
     });
     
-    // Add "GET READY" text
-    const readyText = this.add.text(600, 300, 'GET READY!', {
+    const readyText = this.add.text(600, 230, 'GET READY!', {
       fontSize: '48px',
       fontFamily: 'monospace',
       color: '#ffff00',
@@ -189,7 +176,7 @@ class IntroScene extends Phaser.Scene {
   }
 
   updateCountdown() {
-    // Add scale animation for current number
+    // Adding scale animation for current number
     this.tweens.add({
       targets: this.countdownText,
       scaleX: 1.5,
@@ -199,12 +186,12 @@ class IntroScene extends Phaser.Scene {
       ease: 'Back.easeOut'
     });
     
-    // Play countdown sound effect (using shoot sound as beep)
+    // Playing countdown sound effect using shoot sound as beep
     try {
       const beep = new Howl({
         src: ['./assets/shooting_sound.mp3'],
         volume: 0.3,
-        rate: 2.0, // Higher pitch for beep effect
+        rate: 2.0, 
         html5: true
       });
       beep.play();
@@ -215,10 +202,8 @@ class IntroScene extends Phaser.Scene {
     this.countdownNumber--;
     
     if (this.countdownNumber > 0) {
-      // Update number
       this.countdownText.setText(this.countdownNumber.toString());
     } else {
-      // Show "GO!" and start game
       this.countdownText.setText('GO!');
       this.countdownText.setColor('#00ff00');
       
@@ -257,7 +242,7 @@ class IntroScene extends Phaser.Scene {
       this.background1.y += this.backgroundSpeed;
       this.background2.y += this.backgroundSpeed;
       
-      // Reset background positions for infinite scroll (adjusted for 800px height)
+      // Reset background positions for infinite scroll
       if (this.background1.y > 1200) {
         this.background1.y = this.background2.y - 800;
       }

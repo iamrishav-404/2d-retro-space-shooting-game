@@ -40,7 +40,7 @@ const GameContainer = ({ onGameEnd, playerName }) => {
       }
     };
 
-    // Create the game instance
+    // Game instance
     phaserGameRef.current = new Phaser.Game(config);
 
     // Set up game end callback
