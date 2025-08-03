@@ -3,44 +3,31 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // High Scores Collection
-    match /scores/{scoreId} {
-      // Anyone can read high scores (public leaderboard)
-      allow read: if true;
-      
-      // Only allow creating new scores, not updating existing ones
-      allow create: if 
-        // Validate the data structure
-        request.resource.data.keys().hasAll(['playerName', 'score', 'timestamp', 'gameVersion']) &&
-        request.resource.data.keys().hasOnly(['playerName', 'score', 'timestamp', 'gameVersion']) &&
-        
-        // Validate data types
-        request.resource.data.playerName is string &&
-        request.resource.data.score is number &&
-        request.resource.data.timestamp is string &&
-        request.resource.data.gameVersion is string &&
-        
-        // Validate data constraints
-        request.resource.data.playerName.size() >= 1 &&
-        request.resource.data.playerName.size() <= 20 &&
-        request.resource.data.score >= 0 &&
-        request.resource.data.score <= 20000 &&  
-        
-        // Validate timestamp is recent (within last 5 minutes)
-        timestamp.fromMillis(int(timestamp.fromString(request.resource.data.timestamp).toMillis())) > 
-        request.time - duration.value(300, 's') &&
-        
-        // Validate game version
-        request.resource.data.gameVersion == '1.0';
-      
-      // Never allow updates or deletes to prevent score manipulation
-      allow update, delete: if false;
+    // Players Collection - User-specific data
+    match /players/{userId} {
+      // Users can only read/write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Test collection (for connection testing only)
-    match /test/{testId} {
-      // Allow read/write for connection testing
-      allow read, write: if true;
+    // Leaderboard Collection - Public read, authenticated write
+    match /leaderboard/{scoreId} {
+      // Anyone can read the leaderboard
+      allow read: if true;
+      
+      // Only authenticated users can create scores
+      allow create: if 
+        request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      
+      // Users can only update/delete their own scores
+      allow update, delete: if 
+        request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // Legacy scores collection (read-only)
+    match /scores/{scoreId} {
+      allow read: if true;
     }
     
     // Deny all other collections

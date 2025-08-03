@@ -1,4 +1,3 @@
-// Utility functions for the game
 
 export const formatScore = (score) => {
   return score.toLocaleString();
@@ -66,7 +65,7 @@ export const addScreenShake = (scene, duration = 100, intensity = 5) => {
   scene.cameras.main.shake(duration, intensity * 0.01);
 };
 
-// Sound manager utility
+// Sound manager 
 export const createSoundPool = (scene, key, poolSize = 5) => {
   const pool = [];
   for (let i = 0; i < poolSize; i++) {

@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA078X8R_cK5n39KM-YnnZ_6VODVo4M04E",
@@ -14,5 +15,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
+export const auth = getAuth(app);
+
+
+export const signInAnonymousUser = async () => {
+  try {
+    const result = await signInAnonymously(auth);
+    console.log('Anonymous user signed in:', result.user.uid);
+    return result.user;
+  } catch (error) {
+    console.error('Error signing in anonymously:', error);
+    throw error;
+  }
+};
+
+export const getCurrentUser = () => {
+  return auth.currentUser;
+};
+
+export const onAuthChange = (callback) => {
+  return onAuthStateChanged(auth, callback);
+};
 
 export default app;

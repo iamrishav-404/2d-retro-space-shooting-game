@@ -84,7 +84,6 @@
   100% { transform: translateY(2px); }
 }
 
-/* Loading/Game states */
 .game-loading {
   display: flex;
   flex-direction: column;
@@ -109,7 +108,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive design */
+
 @media (max-width: 768px) {
   .game-ui {
     padding: 10px;

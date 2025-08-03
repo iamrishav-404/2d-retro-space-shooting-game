@@ -86,7 +86,7 @@ class GameScene extends Phaser.Scene {
     this.timerDropTimer = null;
     this.timerEffectTimer = null;
 
-    this.healthThreshold = 40;
+    this.healthThreshold = 50;
     this.originalPlayerSpeed = null; 
 
     this.powerLasers = null;
@@ -1295,7 +1295,13 @@ class GameScene extends Phaser.Scene {
   spawnL1Enemy() {
     const x = Phaser.Math.Between(100, 1200);
     const l1Enemy = new L1EnemyStarShip(this, x, -50);
-    if (this.L1Enemies.countActive(true) < 2) {
+    let activeEnemy;
+    if(this.level >= 4){
+      activeEnemy = 2;
+    } else {
+      activeEnemy = 1;
+    }
+    if (this.L1Enemies.countActive(true) < activeEnemy) {
       this.L1Enemies.add(l1Enemy);
     }
   }
@@ -1476,7 +1482,7 @@ class GameScene extends Phaser.Scene {
         }
       });
     }
-    if (this.health < this.healthThreshold && !this.healDropTimer) {
+    if (this.health <= this.healthThreshold && !this.healDropTimer) {
       this.startHealDropTimer();
     }
 
@@ -1561,10 +1567,10 @@ class GameScene extends Phaser.Scene {
     let speedBoostDelay;
 
     if(this.level >= 4){
-      speedBoostDelay = Phaser.Math.Between(25000, 45000);
+      speedBoostDelay = Phaser.Math.Between(45000, 55000);
     }
     else if(this.level === 3){
-      speedBoostDelay = Phaser.Math.Between(15000, 40000);
+      speedBoostDelay = Phaser.Math.Between(35000, 50000);
     }
     else if(this.level ===2 ){
       speedBoostDelay = Phaser.Math.Between(4000, 8000);
@@ -1639,12 +1645,10 @@ class GameScene extends Phaser.Scene {
     
     let shieldDelay;
     if( this.level === 5) {
-      shieldDelay = Phaser.Math.Between(25000, 35000);
+      shieldDelay = Phaser.Math.Between(20000, 25000);
     } else if (this.level === 4) {
-      shieldDelay = Phaser.Math.Between(18000, 25000); 
-    } else {
-      shieldDelay = Phaser.Math.Between(12000, 25000); 
-    }
+      shieldDelay = Phaser.Math.Between(15000, 20000); 
+    } 
     
     this.shieldTimer = this.time.addEvent({
       delay: shieldDelay,
@@ -1836,11 +1840,11 @@ class GameScene extends Phaser.Scene {
   }
 
   testingGameLevel(){
-    if(this.score > 15000){
+    if(this.score > 600){
       console.log("Game finished")
       this.scene.start("GameOverScene");
     }
-    if(this.score >= 5400){ 
+    if(this.score >= 500){ 
       return 5;
     }
     else if(this.score >= 400){  
@@ -1886,7 +1890,7 @@ class GameScene extends Phaser.Scene {
 
      
       if(this.level === 2){
-        this.healthThreshold = 50; 
+        this.healthThreshold = 60; 
         this.enemySpawnRate = Math.max(500, this.enemySpawnRate - 200);
         if (this.enemySpawnTimer) {
           this.enemySpawnTimer.destroy();
@@ -1896,7 +1900,7 @@ class GameScene extends Phaser.Scene {
         if (this.healDropTimer) {
           this.healDropTimer.destroy();
           this.healDropTimer = null;
-          if (this.health < this.healthThreshold) {
+          if (this.health <= this.healthThreshold) {
             this.startHealDropTimer();
           }
         }
@@ -1911,14 +1915,14 @@ class GameScene extends Phaser.Scene {
       // Stop enemy starships and speed boosts at level 3
       if (this.level === 3) {
         
-        this.healthThreshold = 60; 
+        this.healthThreshold = 70; 
         this.enemySpawnRate = 2500;
         this.enemyStarshipSpawnRate = 8000;
 
         if (this.healDropTimer) {
           this.healDropTimer.destroy();
           this.healDropTimer = null;
-          if (this.health < this.healthThreshold) {
+          if (this.health <= this.healthThreshold) {
             this.startHealDropTimer();
           }
         }
@@ -1961,7 +1965,12 @@ class GameScene extends Phaser.Scene {
       }
 
       if( this.level === 4) {
-        this.healthThreshold = 70;
+        this.healthThreshold = 80;
+
+        if(this.L1EnemySpawnTimer){
+          this.L1EnemySpawnTimer.destroy();
+          this.startL1EnemySpawning();
+        }
         if(!this.L2EnemySpawnTimer) {
           this.startL2EnemySpawning();
           this.startL2EnemyShooting();
@@ -1970,7 +1979,7 @@ class GameScene extends Phaser.Scene {
         if (this.healDropTimer) {
           this.healDropTimer.destroy();
           this.healDropTimer = null;
-          if (this.health < this.healthThreshold) {
+          if (this.health <= this.healthThreshold) {
             this.startHealDropTimer();
           }
         }
@@ -2023,7 +2032,7 @@ class GameScene extends Phaser.Scene {
         if (this.healDropTimer) {
           this.healDropTimer.destroy();
           this.healDropTimer = null;
-          if (this.health < this.healthThreshold) {
+          if (this.health <= this.healthThreshold) {
             this.startHealDropTimer();
           }
         }

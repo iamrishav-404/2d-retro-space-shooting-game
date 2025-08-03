@@ -193,16 +193,16 @@
   border-left: 4px solid #ffd700;
 }
 
-.top-score:nth-child(2) { /* 1st place */
+.top-score:nth-child(2) { 
   background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent);
 }
 
-.top-score:nth-child(3) { /* 2nd place */
+.top-score:nth-child(3) { 
   background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), transparent);
   border-left-color: #c0c0c0;
 }
 
-.top-score:nth-child(4) { /* 3rd place */
+.top-score:nth-child(4) { 
   background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), transparent);
   border-left-color: #cd7f32;
 }

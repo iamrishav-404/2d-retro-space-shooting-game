@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getHighScores } from '../services/scoreService';
+import { getLeaderboard } from '../services/authScoreService';
 import '../styles/HighScores.css';
 
 const HighScores = ({ onBackToMenu, onBackToGameOver, showBackToGameOver = false }) => {
@@ -15,8 +15,9 @@ const HighScores = ({ onBackToMenu, onBackToGameOver, showBackToGameOver = false
     try {
       setLoading(true);
       setError(null);
-      const highScores = await getHighScores(10);
-      setScores(highScores);
+      
+      const leaderboardScores = await getLeaderboard(10);
+      setScores(leaderboardScores);
     } catch (err) {
       console.error('Failed to load high scores:', err);
       setError('Failed to load galactic records. Check your connection.');

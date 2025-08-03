@@ -13,6 +13,106 @@
   font-family: 'Press Start 2P', monospace;
 }
 
+.auth-status {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  font-size: 10px;
+  text-align: right;
+}
+
+.auth-indicator {
+  padding: 8px 12px;
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.auth-indicator.checking {
+  background: rgba(255, 165, 0, 0.2);
+  color: #ffb347;
+  border-color: rgba(255, 165, 0, 0.3);
+}
+
+.auth-indicator.ready {
+  background: rgba(0, 255, 255, 0.2);
+  color: #66ffff;
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+.auth-indicator.authenticated {
+  background: rgba(0, 255, 0, 0.2);
+  color: #90ff90;
+  border-color: rgba(0, 255, 0, 0.3);
+}
+
+.auth-indicator.error {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff6b6b;
+  border-color: rgba(255, 0, 0, 0.3);
+}
+
+.profile-info {
+  display: block;
+  margin-top: 4px;
+  font-size: 8px;
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.name-hint {
+  font-size: 8px;
+  color: #a0a0a0;
+  margin-top: 8px;
+  text-align: center;
+  line-height: 12px;
+  animation: fadeIn 1s ease-out;
+}
+
+
+.welcome-back {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 10px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.welcome-title {
+  font-size: 1.2rem;
+  color: #66ffff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px #66ffff;
+  letter-spacing: 1px;
+}
+
+.player-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+
+.stat {
+  color: #cccccc;
+  text-align: center;
+}
+
+.stat span {
+  color: #ffff00;
+  font-weight: bold;
+  text-shadow: 0 0 5px #ffff00;
+}
+
 .main-menu::before {
   content: '';
   position: absolute;
@@ -403,12 +503,13 @@
   background: rgba(0, 153, 204, 0.2);
   border: 1px solid #0099cc;
   border-radius: 5px;
-  padding: 10px;
+  padding: 15px;
   margin: 20px 0;
   color: #66ccff;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
 }
 
 .conflict-buttons {
@@ -441,7 +542,6 @@
   box-shadow: 0 0 15px rgba(255, 153, 0, 0.5);
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .menu-container {
     margin: 20px;

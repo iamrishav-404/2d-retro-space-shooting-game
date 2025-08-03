@@ -1,4 +1,4 @@
-/* Global reset and base styles */
+
 * {
   margin: 0;
   padding: 0;
@@ -19,7 +19,6 @@ html, body {
   position: relative;
 }
 
-/* Disable text selection for game elements */
 .App * {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -27,7 +26,7 @@ html, body {
   user-select: none;
 }
 
-/* Allow text selection for input fields */
+
 input, textarea {
   -webkit-user-select: text;
   -moz-user-select: text;
@@ -35,12 +34,12 @@ input, textarea {
   user-select: text;
 }
 
-/* Remove button focus outline */
+
 button:focus {
   outline: none;
 }
 
-/* Scrollbar customization */
+
 ::-webkit-scrollbar {
   width: 8px;
 }

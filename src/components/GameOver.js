@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { saveScore } from '../services/scoreService';
+import { saveScore } from '../services/authScoreService';
 import '../styles/GameOver.css';
 
 const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
@@ -17,8 +17,7 @@ const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
       await saveScore(playerName, score);
       setSaved(true);
     } catch (error) {
-      console.error('Failed to save score:', error);
-      setSaveError('Failed to save score. Please try again.');
+      setSaveError(`Failed to save score: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
