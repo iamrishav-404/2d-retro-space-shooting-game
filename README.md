@@ -1,100 +1,39 @@
-# Retro Space Shooter 🚀
+# NEXUS 🚀
 
-A retro-style 2D space shooting game built with React, Phaser.js, Howler.js, and Firebase.
+A retro 2D space shooter where you pilot a starship to defend the galaxy against waves of alien invaders. Collect power-ups, defeat massive bosses, level up through intense battles, and climb the leaderboards as you fight to save humanity's last stronghold.
 
 ## Features
 
-- **Retro pixel-art graphics** with authentic 8-bit style
-- **Immersive sound effects** powered by Howler.js
-- **Progressive difficulty** with increasing enemy waves
-- **High score system** with Firebase Firestore integration
-- **Responsive design** that works on desktop and mobile
-- **Multiple enemy movement patterns** (straight, zigzag, sine wave)
-- **Real-time collision detection** and physics
-- **Pause/resume functionality**
-
-## Tech Stack
-
-- **Frontend**: React.js
-- **Game Engine**: Phaser.js 3
-- **Audio**: Howler.js
-- **Database**: Firebase Firestore
-- **Styling**: CSS3 with retro animations
+- **5 Progressive Levels** with increasing difficulty and new enemy types
+- **Power-ups**: Health boosts, speed boosts, laser upgrades, shields, and time freeze
+- **Multiple Enemy Types**: Basic aliens, starships, and armored bosses with health bars
+- **Winner/Loser System**: Complete the game at 20,000 points or fight for high scores
+- **Firebase Leaderboard** with winner badges for completed games
+- **Retro Sound Effects** and background music
+- **Responsive Controls** with WASD/Arrow keys and spacebar shooting
 
 ## Game Controls
 
 - **Movement**: Arrow Keys or WASD
 - **Shoot**: Spacebar
 - **Pause**: ESC key
-- **Restart**: R key (when paused)
-- **Quit**: Q key (when paused)
 
-## Setup Instructions
+## Quick Start
 
-### 1. Install Dependencies
-
+1. **Install Dependencies**
 ```bash
 npm install
 ```
 
-### 2. Firebase Configuration
+2. **Firebase Setup** (Optional - for leaderboards)
+   - Create a Firebase project and enable Firestore
+   - Update `src/services/firebase.js` with your config
 
-1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable Firestore Database
-3. Copy your Firebase config
-4. Update `src/services/firebase.js` with your Firebase configuration:
-
-```javascript
-const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
-};
-```
-
-### 3. Run the Development Server
-
+3. **Run the Game**
 ```bash
 npm start
 ```
 
-## Project Structure
+Built with React, Phaser.js, Howler.js, and Firebase.
 
-```
-src/
-├── components/          # React components
-├── game/               # Phaser game logic
-├── services/           # Firebase services
-└── styles/             # CSS stylesheets
-```
 
-## License
-
-MIT License
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
