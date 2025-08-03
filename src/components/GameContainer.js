@@ -11,7 +11,6 @@ const GameContainer = ({ onGameEnd, playerName }) => {
   const phaserGameRef = useRef(null);
 
   useEffect(() => {
-    // Game configuration
     const config = {
       type: Phaser.AUTO,
       width: 1200,
@@ -40,7 +39,6 @@ const GameContainer = ({ onGameEnd, playerName }) => {
       }
     };
 
-    // Game instance
     phaserGameRef.current = new Phaser.Game(config);
 
     // Set up game end callback

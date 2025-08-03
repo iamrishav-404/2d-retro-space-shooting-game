@@ -231,6 +231,26 @@
   font-weight: 900;
 }
 
+.winner-badge {
+  color: #00ff00;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-shadow: 0 0 8px #00ff00;
+  animation: pulse-winner 2s infinite ease-in-out;
+  margin-left: 5px;
+}
+
+@keyframes pulse-winner {
+  0%, 100% { 
+    opacity: 1;
+    text-shadow: 0 0 8px #00ff00;
+  }
+  50% { 
+    opacity: 0.7;
+    text-shadow: 0 0 15px #00ff00;
+  }
+}
+
 .date-col {
   color: #cccccc;
   font-size: 0.9rem;

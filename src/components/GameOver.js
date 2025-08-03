@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { saveScore } from '../services/authScoreService';
 import '../styles/GameOver.css';
 
-const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
+const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores, isWinner = false }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(null);
@@ -14,7 +14,7 @@ const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
     setSaveError(null);
 
     try {
-      await saveScore(playerName, score);
+      await saveScore(playerName, score, isWinner);
       setSaved(true);
     } catch (error) {
       setSaveError(`Failed to save score: ${error.message}`);
@@ -27,22 +27,63 @@ const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
     onShowHighScores(true); 
   };
 
+  // Different content based on winner status
+  const getTitle = () => {
+    return isWinner ? "VICTORY" : "MISSION FAILED";
+  };
+
+  const getTitleClass = () => {
+    return isWinner ? "game-over-title winner" : "game-over-title";
+  };
+
+  const getSubtitle = () => {
+    return isWinner ? "MISSION COMPLETE" : "FINAL REPORT";
+  };
+
+  const getSaveSuccessMessage = () => {
+    return isWinner 
+      ? "✓ RECORDED IN HALL OF FAME" 
+      : "✓ SCORE SAVED TO GALACTIC RECORDS";
+  };
+
+  const getReturnButtonText = () => {
+    return isWinner ? "CONTINUE" : "RETURN TO BASE";
+  };
+
+  const getRecordsButtonText = () => {
+    return isWinner ? "HALL OF FAME" : "VIEW RECORDS";
+  };
+
 
   return (
-    <div className="game-over">
-      <div className="game-over-container">
-        <h1 className="game-over-title">MISSION FAILED</h1>
+    <div className={`game-over ${isWinner ? 'winner' : ''}`}>
+      <div className={`game-over-container ${isWinner ? 'winner' : ''}`}>
+        <h1 className={getTitleClass()}>{getTitle()}</h1>
+        
+        {isWinner && (
+          <div className="victory-message">
+            <p>🏆 GALAXY SAVED 🏆</p>
+          </div>
+        )}
         
         <div className="final-stats">
-          <h2>FINAL REPORT</h2>
+          <h2>{getSubtitle()}</h2>
           <div className="stat-line">
             <span className="stat-label">PILOT:</span>
             <span className="stat-value">{playerName}</span>
           </div>
           <div className="stat-line">
             <span className="stat-label">SCORE:</span>
-            <span className="stat-value score-highlight">{score.toLocaleString()}</span>
+            <span className={`stat-value ${isWinner ? 'score-highlight winner-score' : 'score-highlight'}`}>
+              {score.toLocaleString()}
+            </span>
           </div>
+          {isWinner && (
+            <div className="stat-line">
+              <span className="stat-label">STATUS:</span>
+              <span className="stat-value winner-status">GALACTIC HERO</span>
+            </div>
+          )}
         </div>
 
         <div className="score-actions">
@@ -50,15 +91,15 @@ const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
             <button 
               onClick={handleSaveScore}
               disabled={isSaving}
-              className="save-score-button"
+              className={`save-score-button ${isWinner ? 'winner-button' : ''}`}
             >
-              {isSaving ? 'SAVING...' : 'SAVE SCORE'}
+              {isSaving ? 'SAVING...' : (isWinner ? 'SAVE VICTORY' : 'SAVE SCORE')}
             </button>
           )}
 
           {saved && (
-            <div className="save-success">
-              ✓ SCORE SAVED TO GALACTIC RECORDS
+            <div className={`save-success ${isWinner ? 'winner-success' : ''}`}>
+              {getSaveSuccessMessage()}
             </div>
           )}
 
@@ -78,16 +119,16 @@ const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
         <div className="game-over-buttons">
           <button 
             onClick={onBackToMenu}
-            className="menu-button back-button"
+            className={`menu-button back-button ${isWinner ? 'winner-button' : ''}`}
           >
-            RETURN TO BASE
+            {getReturnButtonText()}
           </button>
           
           <button 
             onClick={handleViewHighScores}
-            className="menu-button scores-button"
+            className={`menu-button scores-button ${isWinner ? 'winner-button' : ''}`}
           >
-            VIEW RECORDS
+            {getRecordsButtonText()}
           </button>
         </div>
       </div>

@@ -11,6 +11,12 @@
   overflow: hidden;
 }
 
+.game-over.winner {
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+    linear-gradient(45deg, #001100 0%, #002200 50%, #001100 100%);
+}
+
 .game-over::before {
   content: '';
   position: absolute;
@@ -41,6 +47,13 @@
     inset 0 0 30px rgba(255, 0, 0, 0.1);
 }
 
+.game-over-container.winner {
+  border: 2px solid #00ff00;
+  box-shadow: 
+    0 0 30px rgba(0, 255, 0, 0.3),
+    inset 0 0 30px rgba(0, 255, 0, 0.1);
+}
+
 .game-over-title {
   font-size: 3rem;
   font-weight: 900;
@@ -51,6 +64,32 @@
   margin-bottom: 30px;
   letter-spacing: 4px;
   animation: danger-pulse 1.5s ease-in-out infinite alternate;
+}
+
+.game-over-title.winner {
+  color: #00ff00;
+  text-shadow: 
+    0 0 5px #00ff00,
+    0 0 10px #00ff00,
+    0 0 15px #00ff00;
+  animation: winner-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes winner-glow {
+  0% { 
+    text-shadow: 
+      0 0 8px #00ff00,
+      0 0 15px #00ff00,
+      0 0 20px #00ff00;
+    transform: scale(1);
+  }
+  100% { 
+    text-shadow: 
+      0 0 12px #00ff00,
+      0 0 25px #00ff00,
+      0 0 35px #00ff00;
+    transform: scale(1.02);
+  }
 }
 
 @keyframes danger-pulse {
@@ -65,6 +104,23 @@
       0 0 15px #ff0000,
       0 0 20px #ff0000;
   }
+}
+
+.victory-message {
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+  color: #00ff00;
+  text-shadow: 0 0 8px #00ff00;
+}
+
+.victory-message p {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .final-stats {
@@ -110,6 +166,29 @@
   animation: score-glow 2s ease-in-out infinite alternate;
 }
 
+.score-highlight.winner-score {
+  color: #ffff00 !important;
+  text-shadow: 0 0 5px #ffff00, 0 0 10px #ffff00, 0 0 15px #ffff00;
+  animation: winner-score-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes winner-score-glow {
+  0% { 
+    text-shadow: 0 0 8px #ffff00, 0 0 15px #ffff00;
+    transform: scale(1);
+  }
+  100% { 
+    text-shadow: 0 0 12px #ffff00, 0 0 25px #ffff00;
+    transform: scale(1.03);
+  }
+}
+
+.winner-status {
+  color: #00ff00 !important;
+  text-shadow: 0 0 5px #00ff00;
+  font-weight: 900 !important;
+}
+
 @keyframes score-glow {
   0% { transform: scale(1); }
   100% { transform: scale(1.05); }
@@ -140,6 +219,12 @@
   border-radius: 5px;
 }
 
+.save-score-button.winner-button {
+  background: linear-gradient(45deg, #004400, #008800);
+  border-color: #00ff00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+}
+
 .save-score-button:hover {
   background: linear-gradient(45deg, #006600, #009900);
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
@@ -159,6 +244,24 @@
   letter-spacing: 2px;
   text-shadow: 0 0 10px #00ff00;
   animation: success-pulse 2s ease-in-out infinite alternate;
+}
+
+
+.save-success.winner-success {
+  color: #ffff00;
+  text-shadow: 0 0 5px #ffff00, 0 0 10px #ffff00;
+  animation: winner-celebration 2s ease-in-out infinite alternate;
+}
+
+@keyframes winner-celebration {
+  0% { 
+    text-shadow: 0 0 8px #ffff00, 0 0 15px #ffff00;
+    opacity: 0.9;
+  }
+  100% { 
+    text-shadow: 0 0 12px #ffff00, 0 0 20px #ffff00;
+    opacity: 1;
+  }
 }
 
 @keyframes success-pulse {
@@ -213,6 +316,12 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 5px;
+}
+
+.menu-button.winner-button {
+  background: linear-gradient(45deg, #004400, #008800);
+  border-color: #00ff00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
 }
 
 .menu-button:hover {

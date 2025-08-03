@@ -81,7 +81,10 @@ const HighScores = ({ onBackToMenu, onBackToGameOver, showBackToGameOver = false
                         {index === 1 && ' 🥈'}
                         {index === 2 && ' 🥉'}
                       </span>
-                      <span className="name-col">{score.playerName}</span>
+                      <span className="name-col">
+                        {score.playerName}
+                        {score.isWinner && <span className="winner-badge"> (WINNER)</span>}
+                      </span>
                       <span className="score-col">{score.score.toLocaleString()}</span>
                       {/* <span className="date-col">{formatDate(score.timestamp)}</span> */}
                     </div>

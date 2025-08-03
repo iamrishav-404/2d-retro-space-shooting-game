@@ -10,15 +10,18 @@ const Game = () => {
   const [score, setScore] = useState(0);
   const [playerName, setPlayerName] = useState('');
   const [cameFromGameOver, setCameFromGameOver] = useState(false);
+  const [isWinner, setIsWinner] = useState(false);
 
   const startGame = (name) => {
     setPlayerName(name);
     setScore(0);
+    setIsWinner(false);
     setGameState('playing');
   };
 
-  const endGame = (finalScore) => {
+  const endGame = (finalScore, playerWon = false) => {
     setScore(finalScore);
+    setIsWinner(playerWon);
     setGameState('gameOver');
   };
 
@@ -59,6 +62,7 @@ const Game = () => {
             playerName={playerName}
             onBackToMenu={backToMenu}
             onShowHighScores={showHighScores}
+            isWinner={isWinner}
           />
         );
       case 'highScores':

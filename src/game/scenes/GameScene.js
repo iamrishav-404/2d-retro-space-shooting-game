@@ -1819,8 +1819,9 @@ class GameScene extends Phaser.Scene {
   getGameLevel(){
 
     if(this.score >= 20000){
-      console.log("Game finished")
-      this.scene.start("GameOverScene");
+      console.log("Game finished - PLAYER WINS!")
+      this.gameWon();
+      return;
     }
     if(this.score > 12000){
       return 5; 
@@ -1840,11 +1841,14 @@ class GameScene extends Phaser.Scene {
   }
 
   testingGameLevel(){
-    if(this.score > 600){
-      console.log("Game finished")
-      this.scene.start("GameOverScene");
+    if(this.score >= 15000){
+      this.score = 20000;
+      console.log("Game finished - PLAYER WINS!")
+      this.gameWon();
+      return;
     }
     if(this.score >= 500){ 
+      this.score = 12000;
       return 5;
     }
     else if(this.score >= 400){  
@@ -1864,7 +1868,7 @@ class GameScene extends Phaser.Scene {
 
   updateDifficulty() {
     
-    const newLevel = this.getGameLevel();
+    const newLevel = this.testingGameLevel();
     if (newLevel > this.level) {
       this.level = newLevel;
       this.levelText.setText("LEVEL: " + this.level);
@@ -2102,6 +2106,126 @@ class GameScene extends Phaser.Scene {
 
   }
 
+  gameWon() {
+    if (this.gameEnded) return;
+
+    this.gameEnded = true;
+
+    // Stop all sounds except victory music
+    Object.values(this.sounds).forEach((sound) => {
+      try {
+        sound.stop();
+      } catch (error) {
+        console.warn("Error stopping sound:", error);
+      }
+    });
+
+    // Play victory sound if available, otherwise play intro music
+    try {
+      if (this.sounds.gameIntro) {
+        this.sounds.gameIntro.play();
+      }
+    } catch (error) {
+      console.warn("Error playing victory sound:", error);
+    }
+
+    // Clean up all timers
+    this.cleanupTimers();
+
+    // Clear all game objects
+    this.playerHeal.clear(true, true);
+
+    // Show victory message
+    const victoryText = this.add
+      .text(600, 300, "MISSION ACCOMPLISHED!", {
+        fontSize: "56px",
+        fontFamily: "monospace",
+        color: "#00ff00",
+      })
+      .setOrigin(0.5)
+      .setDepth(200);
+
+    const subText = this.add
+      .text(600, 370, "GALAXY SAVED!", {
+        fontSize: "32px",
+        fontFamily: "monospace",
+        color: "#ffff00",
+      })
+      .setOrigin(0.5)
+      .setDepth(200);
+
+    // Victory animation
+    this.tweens.add({
+      targets: [victoryText, subText],
+      scaleX: { from: 0.5, to: 1.2 },
+      scaleY: { from: 0.5, to: 1.2 },
+      duration: 1000,
+      ease: "Bounce.easeOut",
+      onComplete: () => {
+        // Get the game end callback from registry with winner flag
+        const onGameEnd = this.registry.get("onGameEnd");
+        if (onGameEnd) {
+          this.time.delayedCall(2000, () => {
+            onGameEnd(this.score, true); // true = player won
+          });
+        }
+      }
+    });
+  }
+
+  cleanupTimers() {
+    if (this.enemySpawnTimer) {
+      this.enemySpawnTimer.destroy();
+    }
+    if (this.enemyShootTimer) {
+      this.enemyShootTimer.destroy();
+    }
+    if (this.enemyStarshipSpawnTimer) {
+      this.enemyStarshipSpawnTimer.destroy();
+    }
+    if (this.enemyStarshipShootTimer) {
+      this.enemyStarshipShootTimer.destroy();
+    }
+    if (this.L1EnemySpawnTimer) {
+      this.L1EnemySpawnTimer.destroy();
+    }
+    if (this.L1EnemyShootTimer) {
+      this.L1EnemyShootTimer.destroy();
+    }
+    if (this.L2EnemySpawnTimer) {
+      this.L2EnemySpawnTimer.destroy();
+    }
+    if (this.L2EnemyShootTimer) {
+      this.L2EnemyShootTimer.destroy();
+    }
+    if (this.L3EnemySpawnTimer) {
+      this.L3EnemySpawnTimer.destroy();
+    }
+    if (this.L3EnemyShootTimer) {
+      this.L3EnemyShootTimer.destroy();
+    }
+    if (this.healDropTimer) {
+      this.healDropTimer.remove(false);
+    }
+    if (this.speedBoostTimer) {
+      this.speedBoostTimer.remove(false);
+    }
+    if (this.laserBoostDropTimer) {
+      this.laserBoostDropTimer.remove(false);
+    }
+    if (this.shieldTimer) {
+      this.shieldTimer.remove(false);
+    }
+    if (this.timerDropTimer) {
+      this.timerDropTimer.remove(false);
+    }
+    if (this.timerEffectTimer) {
+      this.timerEffectTimer.remove(false);
+    }
+    
+    this.removeTimeFreezeEffect();
+  }
+
   gameOver() {
     if (this.gameEnded) return;
 
@@ -2123,57 +2247,7 @@ class GameScene extends Phaser.Scene {
       console.warn("Error playing death sound:", error);
     }
 
-    if (this.enemySpawnTimer) {
-      this.enemySpawnTimer.destroy();
-    }
-    if (this.enemyShootTimer) {
-      this.enemyShootTimer.destroy();
-    }
-
-    if (this.enemyStarshipSpawnTimer) {
-      this.enemyStarshipSpawnTimer.destroy();
-    }
-    if (this.enemyStarshipShootTimer) {
-      this.enemyStarshipShootTimer.destroy();
-    }
-    if (this.L1EnemySpawnTimer) {
-      this.L1EnemySpawnTimer.destroy();
-    }
-    if (this.L1EnemyShootTimer) {
-      this.L1EnemyShootTimer.destroy();
-    }
-    if (this.healDropTimer) {
-      this.healDropTimer.remove(false);
-    }
-    if (this.speedBoostTimer) {
-      this.speedBoostTimer.remove(false);
-    }
-    if (this.laserBoostDropTimer) {
-      this.laserBoostDropTimer.remove(false);
-    }
-    if (this.L2EnemySpawnTimer) {
-      this.L2EnemySpawnTimer.destroy();
-    }
-    if (this.L2EnemyShootTimer) {
-      this.L2EnemyShootTimer.destroy();
-    }
-    if (this.shieldTimer) {
-      this.shieldTimer.remove(false);
-    }
-    if (this.L3EnemySpawnTimer) {
-      this.L3EnemySpawnTimer.destroy();
-    }
-    if (this.L3EnemyShootTimer) {
-      this.L3EnemyShootTimer.destroy();
-    }
-    if (this.timerDropTimer) {
-      this.timerDropTimer.remove(false);
-    }
-    if (this.timerEffectTimer) {
-      this.timerEffectTimer.remove(false);
-    }
-    
-    this.removeTimeFreezeEffect();
+    this.cleanupTimers();
 
     this.playerHeal.clear(true, true);
 
@@ -2181,7 +2255,7 @@ class GameScene extends Phaser.Scene {
     const onGameEnd = this.registry.get("onGameEnd");
     if (onGameEnd) {
       this.time.delayedCall(1000, () => {
-        onGameEnd(this.score);
+        onGameEnd(this.score, false); // false = player lost
       });
     }
   }

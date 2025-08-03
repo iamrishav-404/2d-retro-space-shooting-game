@@ -91,7 +91,7 @@ export const updatePlayerProfile = async (updates) => {
 };
 
 // Score Management Service
-export const saveScore = async (playerName, score) => {
+export const saveScore = async (playerName, score, isWinner = false) => {
   const user = await ensureAuthenticated();
   if (!user) throw new Error('Authentication failed');
 
@@ -132,7 +132,8 @@ export const saveScore = async (playerName, score) => {
       score: newScore,
       timestamp: new Date().toISOString(),
       userId: user.uid,
-      gameVersion: '1.0'
+      gameVersion: '1.0',
+      isWinner: isWinner
     };
 
     leaderboardRef = await addDoc(collection(db, 'leaderboard'), scoreData);
@@ -230,7 +231,8 @@ export const getLeaderboard = async (limitCount = 10) => {
         playerName: data.playerName || 'Unknown',
         score: data.score || 0,
         timestamp: data.timestamp || new Date().toISOString(),
-        userId: data.userId || 'anonymous'
+        userId: data.userId || 'anonymous',
+        isWinner: data.isWinner || false
       });
     });
     
