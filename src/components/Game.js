@@ -9,6 +9,7 @@ const Game = () => {
   const [gameState, setGameState] = useState('menu'); 
   const [score, setScore] = useState(0);
   const [playerName, setPlayerName] = useState('');
+  const [cameFromGameOver, setCameFromGameOver] = useState(false);
 
   const startGame = (name) => {
     setPlayerName(name);
@@ -21,12 +22,18 @@ const Game = () => {
     setGameState('gameOver');
   };
 
-  const showHighScores = () => {
+  const showHighScores = (fromGameOver = false) => {
+    setCameFromGameOver(fromGameOver);
     setGameState('highScores');
   };
 
   const backToMenu = () => {
+    setCameFromGameOver(false);
     setGameState('menu');
+  };
+
+  const backToGameOver = () => {
+    setGameState('gameOver');
   };
 
   const renderCurrentView = () => {
@@ -58,6 +65,8 @@ const Game = () => {
         return (
           <HighScores 
             onBackToMenu={backToMenu}
+            onBackToGameOver={backToGameOver}
+            showBackToGameOver={cameFromGameOver}
           />
         );
       default:

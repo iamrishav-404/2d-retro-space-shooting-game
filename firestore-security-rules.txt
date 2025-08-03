@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // High Scores Collection
+    match /scores/{scoreId} {
+      // Anyone can read high scores (public leaderboard)
+      allow read: if true;
+      
+      // Only allow creating new scores, not updating existing ones
+      allow create: if 
+        // Validate the data structure
+        request.resource.data.keys().hasAll(['playerName', 'score', 'timestamp', 'gameVersion']) &&
+        request.resource.data.keys().hasOnly(['playerName', 'score', 'timestamp', 'gameVersion']) &&
+        
+        // Validate data types
+        request.resource.data.playerName is string &&
+        request.resource.data.score is number &&
+        request.resource.data.timestamp is string &&
+        request.resource.data.gameVersion is string &&
+        
+        // Validate data constraints
+        request.resource.data.playerName.size() >= 1 &&
+        request.resource.data.playerName.size() <= 20 &&
+        request.resource.data.score >= 0 &&
+        request.resource.data.score <= 20000 &&  
+        
+        // Validate timestamp is recent (within last 5 minutes)
+        timestamp.fromMillis(int(timestamp.fromString(request.resource.data.timestamp).toMillis())) > 
+        request.time - duration.value(300, 's') &&
+        
+        // Validate game version
+        request.resource.data.gameVersion == '1.0';
+      
+      // Never allow updates or deletes to prevent score manipulation
+      allow update, delete: if false;
+    }
+    
+    // Test collection (for connection testing only)
+    match /test/{testId} {
+      // Allow read/write for connection testing
+      allow read, write: if true;
+    }
+    
+    // Deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

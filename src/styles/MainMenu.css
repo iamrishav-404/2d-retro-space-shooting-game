@@ -339,6 +339,108 @@
   text-shadow: 0 0 5px #ffffff;
 }
 
+/* Name Conflict Dialog */
+.name-conflict-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: dialog-fade-in 0.3s ease;
+}
+
+@keyframes dialog-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.conflict-content {
+  background: 
+    linear-gradient(145deg, rgba(20, 0, 0, 0.95), rgba(40, 10, 10, 0.95));
+  border: 3px solid #ff6666;
+  border-radius: 10px;
+  padding: 30px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 
+    0 0 30px rgba(255, 102, 102, 0.5),
+    inset 0 0 30px rgba(255, 102, 102, 0.1);
+  animation: dialog-slide-in 0.3s ease;
+}
+
+@keyframes dialog-slide-in {
+  0% { transform: translateY(-50px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.conflict-content h3 {
+  color: #ff6666;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #ff6666;
+  letter-spacing: 2px;
+}
+
+.conflict-content p {
+  color: #ffffff;
+  margin: 10px 0;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+.conflict-score {
+  color: #ffff00;
+  font-weight: bold;
+  text-shadow: 0 0 8px #ffff00;
+}
+
+.conflict-warning {
+  background: rgba(0, 153, 204, 0.2);
+  border: 1px solid #0099cc;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px 0;
+  color: #66ccff;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.conflict-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.modify-button {
+  background: linear-gradient(45deg, #003366, #006699);
+  border-color: #0099cc;
+  color: #0099cc;
+}
+
+.modify-button:hover {
+  background: linear-gradient(45deg, #006699, #0099cc);
+  box-shadow: 0 0 15px rgba(0, 153, 204, 0.5);
+}
+
+.force-button {
+  background: linear-gradient(45deg, #663300, #cc6600);
+  border-color: #ff9900;
+  color: #ff9900;
+}
+
+.force-button:hover {
+  background: linear-gradient(45deg, #cc6600, #ff9900);
+  box-shadow: 0 0 15px rgba(255, 153, 0, 0.5);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .menu-container {

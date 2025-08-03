@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getHighScores } from '../services/scoreService';
 import '../styles/HighScores.css';
 
-const HighScores = ({ onBackToMenu }) => {
+const HighScores = ({ onBackToMenu, onBackToGameOver, showBackToGameOver = false }) => {
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -66,7 +66,7 @@ const HighScores = ({ onBackToMenu }) => {
                     <span className="rank-col">RANK</span>
                     <span className="name-col">PILOT</span>
                     <span className="score-col">SCORE</span>
-                    <span className="date-col">DATE</span>
+                    {/* <span className="date-col">DATE</span> */}
                   </div>
                   
                   {scores.map((score, index) => (
@@ -82,7 +82,7 @@ const HighScores = ({ onBackToMenu }) => {
                       </span>
                       <span className="name-col">{score.playerName}</span>
                       <span className="score-col">{score.score.toLocaleString()}</span>
-                      <span className="date-col">{formatDate(score.timestamp)}</span>
+                      {/* <span className="date-col">{formatDate(score.timestamp)}</span> */}
                     </div>
                   ))}
                 </div>
@@ -92,6 +92,15 @@ const HighScores = ({ onBackToMenu }) => {
         </div>
 
         <div className="high-scores-buttons">
+          {showBackToGameOver && (
+            <button 
+              onClick={onBackToGameOver}
+              className="menu-button back-to-gameover-button"
+            >
+              BACK TO MISSION REPORT
+            </button>
+          )}
+          
           <button 
             onClick={onBackToMenu}
             className="menu-button back-button"

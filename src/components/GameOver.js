@@ -25,14 +25,9 @@ const GameOver = ({ score, playerName, onBackToMenu, onShowHighScores }) => {
   };
 
   const handleViewHighScores = () => {
-    if (!saved && !saveError) {
-      handleSaveScore().then(() => {
-        onShowHighScores();
-      });
-    } else {
-      onShowHighScores();
-    }
+    onShowHighScores(true); 
   };
+
 
   return (
     <div className="game-over">
