@@ -1841,23 +1841,23 @@ class GameScene extends Phaser.Scene {
   }
 
   testingGameLevel(){
-    if(this.score >= 15000){
-      this.score = 20000;
+    if(this.score >= 6400){
+      // this.score = 20000;
       console.log("Game finished - PLAYER WINS!")
       this.gameWon();
       return;
     }
-    if(this.score >= 500){ 
-      this.score = 12000;
+    if(this.score >= 3200){ 
+      // this.score = 12000;
       return 5;
     }
-    else if(this.score >= 400){  
+    else if(this.score >= 1600){  
       return 4;
     }
-    else if(this.score >= 300){  
+    else if(this.score >= 800){  
     return 3;
   }
-  else if(this.score >= 200){  
+  else if(this.score >= 400){  
     return 2; 
   }
   else {
@@ -1868,7 +1868,7 @@ class GameScene extends Phaser.Scene {
 
   updateDifficulty() {
     
-    const newLevel = this.testingGameLevel();
+    const newLevel = this.getGameLevel();
     if (newLevel > this.level) {
       this.level = newLevel;
       this.levelText.setText("LEVEL: " + this.level);
@@ -2076,18 +2076,19 @@ class GameScene extends Phaser.Scene {
     this.scene.pause();
     this.scene.launch("PauseScene");
 
-    // Pause all sounds properly
+
     Object.values(this.sounds).forEach((sound) => {
       try {
-        if (sound.playing()) {
+        if (sound.playing && sound.playing()) {
           sound.pause();
         }
       } catch (error) {
         console.warn("Error pausing sound:", error);
       }
     });
-    // As Layer Sound may be running , as it runs on loop so check again
-    if (this.sounds.laserBoost && this.sounds.laserBoost.playing()) {
+    
+    // Laser Sound may be running on loop, so force stop it
+    if (this.sounds.laserBoost && this.sounds.laserBoost.playing && this.sounds.laserBoost.playing()) {
       this.sounds.laserBoost.stop();
     }
   }
@@ -2111,16 +2112,8 @@ class GameScene extends Phaser.Scene {
 
     this.gameEnded = true;
 
-    // Stop all sounds except victory music
-    Object.values(this.sounds).forEach((sound) => {
-      try {
-        sound.stop();
-      } catch (error) {
-        console.warn("Error stopping sound:", error);
-      }
-    });
+    this.stopAllSounds();
 
-    // Play victory sound if available, otherwise play intro music
     try {
       if (this.sounds.gameIntro) {
         this.sounds.gameIntro.play();
@@ -2129,13 +2122,10 @@ class GameScene extends Phaser.Scene {
       console.warn("Error playing victory sound:", error);
     }
 
-    // Clean up all timers
     this.cleanupTimers();
 
-    // Clear all game objects
     this.playerHeal.clear(true, true);
 
-    // Show victory message
     const victoryText = this.add
       .text(600, 300, "MISSION ACCOMPLISHED!", {
         fontSize: "56px",
@@ -2226,18 +2216,43 @@ class GameScene extends Phaser.Scene {
     this.removeTimeFreezeEffect();
   }
 
+  stopAllSounds() {
+    try {
+      if (this.sounds.bgMusic) {
+        this.sounds.bgMusic.stop();
+        if (this.sounds.bgMusic.unload) {
+          this.sounds.bgMusic.unload(); 
+        }
+      }
+
+      if (this.sounds.laserBoost) {
+        this.sounds.laserBoost.stop();
+      }
+
+      Object.entries(this.sounds).forEach(([key, sound]) => {
+        try {
+          if (sound && typeof sound.stop === 'function') {
+            sound.stop();
+            if (sound.playing && sound.playing()) {
+              sound.pause();
+              sound.seek(0); 
+            }
+          }
+        } catch (error) {
+          console.warn(`Error stopping ${key} sound:`, error);
+        }
+      });
+    } catch (error) {
+      console.warn("Error in stopAllSounds:", error);
+    }
+  }
+
   gameOver() {
     if (this.gameEnded) return;
 
     this.gameEnded = true;
 
-    Object.values(this.sounds).forEach((sound) => {
-      try {
-        sound.stop();
-      } catch (error) {
-        console.warn("Error stopping sound:", error);
-      }
-    });
+    this.stopAllSounds();
 
     try {
       if (this.sounds.playerDie) {
@@ -2251,11 +2266,10 @@ class GameScene extends Phaser.Scene {
 
     this.playerHeal.clear(true, true);
 
-    // Get the game end callback from registry
     const onGameEnd = this.registry.get("onGameEnd");
     if (onGameEnd) {
       this.time.delayedCall(1000, () => {
-        onGameEnd(this.score, false); // false = player lost
+        onGameEnd(this.score, false); 
       });
     }
   }
