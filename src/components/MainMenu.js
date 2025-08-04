@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { 
   checkPlayerNameExists, 
   generateUniquePlayerName,
   ensureAuthenticated,
   getPlayerProfile,
   initializePlayerForGame,
-  isUserAuthenticated,
-  getCurrentUserId
 } from '../services/authScoreService';
 import { onAuthChange } from '../services/firebase';
 import '../styles/MainMenu.css';

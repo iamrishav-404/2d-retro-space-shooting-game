@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { getLeaderboard } from '../services/authScoreService';
 import '../styles/HighScores.css';
 
@@ -24,10 +24,6 @@ const HighScores = ({ onBackToMenu, onBackToGameOver, showBackToGameOver = false
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDate = (timestamp) => {
-    return new Date(timestamp).toLocaleDateString();
   };
 
   return (
