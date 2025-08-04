@@ -36,4 +36,8 @@ npm start
 
 Built with React, Phaser.js, Howler.js, and Firebase.
 
+## 🎮 Gameplay Demo
 
+**Winner Gameplay Video**: [Watch on Google Drive](https://drive.google.com/file/d/1yT_EXSIthWIml_bqSXAatkKQ7AhCkYx0/view?usp=sharing)
+
+*See a complete playthrough showing all 5 levels, power-ups, and the victory screen!*
